@@ -1,7 +1,16 @@
 package fbp.image.processing;
 
+import java.awt.BasicStroke;
+import java.awt.Color;
 import java.awt.Font;
+import java.awt.GradientPaint;
 import java.awt.Graphics2D;
+import java.awt.Paint;
+import java.awt.Rectangle;
+import java.awt.RenderingHints;
+import java.awt.Shape;
+import java.awt.font.GlyphVector;
+import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.InputStream;
@@ -12,6 +21,15 @@ import java.util.Set;
 
 import javax.imageio.ImageIO;
 //import javax.swing.text.Position;
+
+
+
+
+
+
+
+
+
 
 import org.imgscalr.Scalr;
 
@@ -59,18 +77,114 @@ public class Starter {
 					exportImageWidth, exportImageHeight, 
 					Scalr.OP_ANTIALIAS);
 			
-			 Graphics2D graphics2D = (Graphics2D)destinationImage.getGraphics();
-			 graphics2D.setFont(new Font("Arial", Font.BOLD, 30));
-			 graphics2D.drawString("Watermarked!", destinationImage.getWidth()/2, destinationImage.getHeight() / 2);
+			Graphics2D g2d = destinationImage.createGraphics();
+			
+			g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
+                     RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+
+		    // create watermark text shape for rendering
+	        Font font = new Font(Font.SANS_SERIF, Font.PLAIN, 24);
+	        GlyphVector fontGV = font.createGlyphVector(g2d.getFontRenderContext(), WATERMARK_TEXT);
+	        Rectangle size = fontGV.getPixelBounds(g2d.getFontRenderContext(), 0, 0);
+	        Shape textShape = fontGV.getOutline();
+	        double textWidth = size.getWidth();
+	        double textHeight = size.getHeight();
+	        AffineTransform rotate45 = AffineTransform.getRotateInstance(Math.PI / 5d);
+	        Shape rotatedText = rotate45.createTransformedShape(textShape);
+
+	        // use a gradient that repeats 4 times
+	        g2d.setPaint((Paint) new GradientPaint(0, 0,
+	                            new Color(0.5f, 0.5f, 0.5f, 0.5f),
+	                            destinationImage.getWidth() / 2, destinationImage.getHeight() / 2,
+	                            new Color(0.5f, 0.5f, 0.5f, 0.5f)));
+	        g2d.setStroke(new BasicStroke(0.5f));
+
+	        // step in y direction is calc'ed using pythagoras + 5 pixel padding
+	        double yStep = Math.sqrt(textWidth * textWidth / 2) + 20;
+
+	        // step over image rendering watermark text
+	        for (double x = -textHeight * 3; x < destinationImage.getWidth(); x += (textHeight * 3)) {
+	            double y = -yStep;
+	            for (y = -yStep * 2 ; y < destinationImage.getHeight(); y += yStep) {
+	                g2d.draw(rotatedText);
+	                g2d.fill(rotatedText);
+	                g2d.translate(0, yStep);
+	            }
+	            g2d.translate(textHeight * 3, -(y + yStep));
+	        }			
+			
+	        ImageIO.write(destinationImage, "jpg", new File(exportFileName));
+			
+			
+			
+//	        Graphics2D g2d = (Graphics2D) destinationImage.getGraphics();
+//	        
+//	        // initializes necessary graphic properties
+//	        AlphaComposite alphaChannel = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.3f);
+//	        g2d.setComposite(alphaChannel);
+//	        g2d.setColor(Color.GRAY);
+//	        g2d.setFont(new Font("Arial", Font.BOLD, 64));
+//	        
+//	        
+//	        
+//	        FontMetrics fontMetrics = g2d.getFontMetrics();
+//	        Rectangle2D rect = fontMetrics.getStringBounds(WATERMARK_TEXT, g2d);
+//	 
+//	        // calculates the coordinate where the String is painted
+//	        int centerX = (destinationImage.getWidth() - (int) rect.getWidth()) / 2;
+//	        int centerY = destinationImage.getHeight() / 2;
+//	 
+//	        // paints the textual watermark
+//	        g2d.drawString(WATERMARK_TEXT, centerX, centerY);
+//	 
+//	        //ImageIO.write(sourceImage, "jpg", destImageFile);
+//	        ImageIO.write(destinationImage, "jpg", new File(exportFileName));
+//	        g2d.dispose();
+//	 
+//	        //System.out.println("The tex watermark is added to the image.");			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+//			 Graphics2D graphics2D = (Graphics2D)destinationImage.getGraphics();
+//			 graphics2D.setFont(new Font("Arial", Font.BOLD, 30));
+//			 graphics2D.drawString("Watermarked!", destinationImage.getWidth()/2, destinationImage.getHeight() / 2);
 			 
-			 
+
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
 			
 			
 //			// Set up the caption properties
 //			String caption = WATERMARK_TEXT;
 //			Font font = new Font("Monospaced", Font.PLAIN, 14);
 //			Color c = Color.black;
-//			Position position = Position;
+//			Position position = Position.CENTER;
 //			int insetPixels = 0;
 //
 //			// Apply caption to the image
@@ -127,19 +241,7 @@ public class Starter {
 	        
 			
 			
-			ImageIO.write(destinationImage, "jpg", new File(exportFileName));
-			
-			
-//			inputStream = new FileInputStream(fileName);
-//			outputStream = new FileOutputStream(exportFileName);
-//			byte[] buffer = new byte[2048];
-//			int length = 0;
-//			while ((length = inputStream.read(buffer)) != -1) {
-//				//System.out.println("Buffer Read of length: " + length);
-//				outputStream.write(buffer, 0, length);
-//			}
-//			inputStream.close();
-//			outputStream.close();
+			//ImageIO.write(destinationImage, "jpg", new File(exportFileName));
 			System.out.println("File exported: " + exportFileName);
 		}
 		cal = Calendar.getInstance();
