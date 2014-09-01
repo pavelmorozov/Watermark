@@ -99,19 +99,21 @@ public class Starter {
 	                            new Color(0.5f, 0.5f, 0.5f, 0.5f)));
 	        g2d.setStroke(new BasicStroke(0.5f));
 
-	        // step in y direction is calc'ed using pythagoras + 5 pixel padding
-	        double yStep = Math.sqrt(textWidth * textWidth / 2) + 20;
-
-	        // step over image rendering watermark text
-	        for (double x = -textHeight * 3; x < destinationImage.getWidth(); x += (textHeight * 3)) {
-	            double y = -yStep;
-	            for (y = -yStep * 2 ; y < destinationImage.getHeight(); y += yStep) {
-	                g2d.draw(rotatedText);
-	                g2d.fill(rotatedText);
-	                g2d.translate(0, yStep);
-	            }
-	            g2d.translate(textHeight * 3, -(y + yStep));
-	        }			
+	        //double yStep = Math.sqrt(textWidth * textWidth / 2) + 20;
+	        
+//	        // step in y direction is calc'ed using pythagoras + 5 pixel padding
+//	        double yStep = Math.sqrt(textWidth * textWidth / 2) + 20;
+//
+//	        // step over image rendering watermark text
+//	        for (double x = -textHeight * 3; x < destinationImage.getWidth(); x += (textHeight * 3)) {
+//	            double y = -yStep;
+//	            for (y = -yStep * 2 ; y < destinationImage.getHeight(); y += yStep) {
+//	                g2d.draw(rotatedText);
+//	                g2d.fill(rotatedText);
+//	                g2d.translate(0, yStep);
+//	            }
+//	            g2d.translate(textHeight * 3, -(y + yStep));
+//	        }			
 			
 	        ImageIO.write(destinationImage, "jpg", new File(exportFileName));
 			
