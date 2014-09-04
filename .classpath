@@ -5,5 +5,6 @@
 	<classpathentry kind="lib" path="D:/java/projects/Watermark/imgscalr-lib-4.2/imgscalr-lib-4.2.jar"/>
 	<classpathentry kind="lib" path="D:/java/projects/Watermark/imgscalr-lib-4.2/imgscalr-lib-4.2-javadoc.jar"/>
 	<classpathentry kind="lib" path="D:/java/projects/Watermark/imgscalr-lib-4.2/imgscalr-lib-4.2-sources.jar"/>
+	<classpathentry kind="lib" path="D:/java/jdk1.7.0_51/jre/lib/jfxrt.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
