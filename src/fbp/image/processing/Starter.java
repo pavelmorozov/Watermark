@@ -24,10 +24,13 @@ public class Starter extends Application{
 	private static final String VERTICAL_BLANK_NAME = System.getProperty("user.dir")
 			+"\\img\\vertical.jpg";
 	private static final String HORIZONTAL_BLANK_NAME = System.getProperty("user.dir")
-			+"\\img\\horizontal.jpg";	
+			+"\\img\\horizontal.jpg";
+	
+	private final static int IMAGE_SIZE_H = 720;
+	private final static int IMAGE_SIZE_W = 480;	
 
-	private static final Integer SCALED_PREVIW_X = 96;
-	private static final Integer SCALED_PREVIW_Y = 144;
+	private static final Integer SCALED_PREVIW_X = 192;
+	private static final Integer SCALED_PREVIW_Y = 288;
 	
 	private Stage primaryStage;
 	
@@ -61,6 +64,7 @@ public class Starter extends Application{
         
         //StackPane rootStackPane = new StackPane();
         GridPane rootGrid = new GridPane();
+        rootGrid.setGridLinesVisible(true);
         rootGrid.setHgap(10);
         rootGrid.setVgap(10);
         rootGrid.setPadding(new Insets(5, 5, 5, 5));
@@ -77,7 +81,7 @@ public class Starter extends Application{
         
         Button chooseSourceBtn = new Button();
         chooseSourceBtn.setText("...");
-        rootGrid.add(chooseSourceBtn, 3, 1);
+        rootGrid.add(chooseSourceBtn, 2, 1);
 
         Label destinationLabel = new Label("Destination folder:");
         rootGrid.add(destinationLabel, 0, 2);
@@ -87,7 +91,7 @@ public class Starter extends Application{
         
         Button chooseDestinationBtn = new Button();
         chooseDestinationBtn.setText("...");
-        rootGrid.add(chooseDestinationBtn, 3, 2);
+        rootGrid.add(chooseDestinationBtn, 2, 2);
 
         Label watermarkTextLabel = new Label("Watermark text:");
         rootGrid.add(watermarkTextLabel, 0, 3);
@@ -117,13 +121,29 @@ public class Starter extends Application{
         
         Canvas verticalCanvas = new Canvas (SCALED_PREVIW_X, SCALED_PREVIW_Y);
         GraphicsContext verticalGraphicsContext = verticalCanvas.getGraphicsContext2D();
-        verticalGraphicsContext.setFill(Color.web("#775555",0.3));
+        verticalGraphicsContext.setFill(Color.web("#ffffff",1));
         //verticalGraphicsContext.fillOval(10, 60, 30, 30);
         verticalGraphicsContext.fillRect(0, 0, SCALED_PREVIW_X, SCALED_PREVIW_Y);
         //verticalGraphicsContext.drawImage(arg0, arg1, arg2);
-        verticalGraphicsContext.drawImage
-        	(testImage, 0, 0, SCALED_PREVIW_X, SCALED_PREVIW_Y);
-        rootGrid.add(verticalCanvas, 0, 6);
+//        verticalGraphicsContext.drawImage
+//        	(testImage, 0, 0, SCALED_PREVIW_X, SCALED_PREVIW_Y);
+        rootGrid.add(verticalCanvas, 0, 6, 2, 1);
+
+        Canvas horizontalCanvas = new Canvas (SCALED_PREVIW_Y, SCALED_PREVIW_X);
+        GraphicsContext horizontalGraphicsContext = horizontalCanvas.getGraphicsContext2D();
+        horizontalGraphicsContext.setFill(Color.web("#ffffff",1));
+        horizontalGraphicsContext.fillRect(0, 0, SCALED_PREVIW_Y, SCALED_PREVIW_X);
+        rootGrid.add(horizontalCanvas, 0, 7, 4, 1);
+
+        
+        Canvas mainCanvas = new Canvas (IMAGE_SIZE_H, IMAGE_SIZE_H);
+        GraphicsContext mainGraphicsContext = mainCanvas.getGraphicsContext2D();
+        mainGraphicsContext.setFill(Color.web("#ffffff",1));
+        mainGraphicsContext.fillRect(0, 0, IMAGE_SIZE_H, IMAGE_SIZE_H);
+        rootGrid.add(mainCanvas, 3, 0, 1, 9);        
+        
+        
+        
         
 //        root.getChildren().add(btn);
         Scene primaryScene = new Scene(rootGrid, 1200, 740);
