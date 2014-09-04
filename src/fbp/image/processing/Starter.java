@@ -22,6 +22,7 @@ public class Starter extends Application{
 
     @Override
     public void start(final Stage primaryStage) {
+    	
         primaryStage.setTitle(APP_CAPTION);
         
         
@@ -31,6 +32,7 @@ public class Starter extends Application{
         openSourceCatalogBtn.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
+            	chooseFile("Source");
                 FileChooser fileChooser = new FileChooser();
                 fileChooser.setTitle("Open Resource File");
                 fileChooser.showOpenDialog(primaryStage);                
@@ -54,8 +56,13 @@ public class Starter extends Application{
         primaryStage.show();
     }
     
-    
-
-	
-	
+	private void chooseFile(String fileChooseMode){
+		if (fileChooseMode.equals("Source")){
+		    FileChooser fileChooser = new FileChooser();
+		    fileChooser.setTitle("Open Resource File");
+		    fileChooser.showOpenDialog(primaryStage);
+		}else if (fileChooseMode.equals("Output")){
+	     
+	    }
+	}
 }
