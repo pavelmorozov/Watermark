@@ -48,7 +48,7 @@ public class Starter extends Application{
     	
         primaryStage.setTitle(APP_CAPTION);
         
-        InitialSettings initialSettings = new InitialSettings();
+        
         
 //        Button openSourceCatalogBtn = new Button();
 //        openSourceCatalogBtn.setText("Open source catalog");
@@ -71,45 +71,66 @@ public class Starter extends Application{
         
         Text titleText = new Text(APP_CAPTION);
         titleText.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
-        rootGrid.add(titleText, 0, 0, 2, 1);
+        rootGrid.add(titleText, 0, 0, 3, 1);
 
         Label sourceLabel = new Label("Source folder:");
         rootGrid.add(sourceLabel, 0, 1);
 
         TextField sourceField = new TextField();
-        rootGrid.add(sourceField, 1, 1);
+        rootGrid.add(sourceField, 1, 1, 2, 1);
         
         Button chooseSourceBtn = new Button();
         chooseSourceBtn.setText("...");
-        rootGrid.add(chooseSourceBtn, 2, 1);
+        rootGrid.add(chooseSourceBtn, 3, 1);
 
         Label destinationLabel = new Label("Destination folder:");
         rootGrid.add(destinationLabel, 0, 2);
 
         TextField outputField = new TextField ();
-        rootGrid.add(outputField, 1, 2);
+        rootGrid.add(outputField, 1, 2, 2, 1);
         
         Button chooseDestinationBtn = new Button();
         chooseDestinationBtn.setText("...");
-        rootGrid.add(chooseDestinationBtn, 2, 2);
+        rootGrid.add(chooseDestinationBtn, 3, 2);
 
         Label watermarkTextLabel = new Label("Watermark text:");
         rootGrid.add(watermarkTextLabel, 0, 3);
 
         TextField watermarkTextField = new TextField ();
-        rootGrid.add(watermarkTextField, 1, 3);
+        rootGrid.add(watermarkTextField, 1, 3, 2, 1);
         
         Label watermarkFontSizeLabel = new Label("Font size:");
         rootGrid.add(watermarkFontSizeLabel, 0, 4);
 
         TextField watermarkFontSizeField = new TextField ();
-        rootGrid.add(watermarkFontSizeField, 1, 4);
+        watermarkFontSizeField.setMaxWidth(30);        
+        rootGrid.add(watermarkFontSizeField, 1, 4, 1, 1);
         
         Label watermarkOpacityLabel = new Label("Opacity:");
         rootGrid.add(watermarkOpacityLabel, 0, 5);
 
         TextField watermarkOpacityField = new TextField ();
-        rootGrid.add(watermarkOpacityField, 1, 5);
+        watermarkOpacityField.setMaxWidth(30);
+        rootGrid.add(watermarkOpacityField, 1, 5, 1, 1);
+        
+        Label previewFileLabel = new Label("Preview:");
+        rootGrid.add(previewFileLabel, 0, 6);
+
+        TextField previewFileField = new TextField();
+        rootGrid.add(previewFileField, 1, 6, 2, 1);
+        
+        Button choosePreviewFileBtn = new Button();
+        choosePreviewFileBtn.setText("...");
+        rootGrid.add(choosePreviewFileBtn, 3, 6);        
+        
+        Button choosePreviewPrevBtn = new Button();
+        choosePreviewPrevBtn.setText("- < -");
+        rootGrid.add(choosePreviewPrevBtn, 1, 7);        
+        
+        Button choosePreviewNextBtn = new Button();
+        choosePreviewNextBtn.setText("- > -");
+        rootGrid.add(choosePreviewNextBtn, 2, 7);        
+        
         
 //        Image verticalBlankImage = new Image("file:img/vertical.jpg");
         Image testImage = new Image("file:output/1.original.jpg");
@@ -127,38 +148,33 @@ public class Starter extends Application{
         //verticalGraphicsContext.drawImage(arg0, arg1, arg2);
 //        verticalGraphicsContext.drawImage
 //        	(testImage, 0, 0, SCALED_PREVIW_X, SCALED_PREVIW_Y);
-        rootGrid.add(verticalCanvas, 0, 6, 2, 1);
+        rootGrid.add(verticalCanvas, 0, 8, 3, 1);
 
         Canvas horizontalCanvas = new Canvas (SCALED_PREVIW_Y, SCALED_PREVIW_X);
         GraphicsContext horizontalGraphicsContext = horizontalCanvas.getGraphicsContext2D();
         horizontalGraphicsContext.setFill(Color.web("#ffffff",1));
         horizontalGraphicsContext.fillRect(0, 0, SCALED_PREVIW_Y, SCALED_PREVIW_X);
-        rootGrid.add(horizontalCanvas, 0, 7, 4, 1);
-
+        rootGrid.add(horizontalCanvas, 0, 9, 5, 1);
         
         Canvas mainCanvas = new Canvas (IMAGE_SIZE_H, IMAGE_SIZE_H);
         GraphicsContext mainGraphicsContext = mainCanvas.getGraphicsContext2D();
-        mainGraphicsContext.setFill(Color.web("#ffffff",1));
+        mainGraphicsContext.setFill(Color.web("#777777",1));
         mainGraphicsContext.fillRect(0, 0, IMAGE_SIZE_H, IMAGE_SIZE_H);
-        rootGrid.add(mainCanvas, 3, 0, 1, 9);        
+        mainGraphicsContext.drawImage
+        	(testImage, 0, 0, IMAGE_SIZE_W, IMAGE_SIZE_H);        
         
-        
-        
+        rootGrid.add(mainCanvas, 4, 0, 1, 10);        
         
 //        root.getChildren().add(btn);
-        Scene primaryScene = new Scene(rootGrid, 1200, 740);
-        
-        outputField.setText(initialSettings.getOutput());
-        sourceField.setText(initialSettings.getSource());
+        Scene primaryScene = new Scene(rootGrid, 1100, 725);
+
+        InitialSettings initialSettings = new InitialSettings(rootGrid);
         
         primaryScene.getStylesheets().add(Starter.class.getResource("ui.css").toExternalForm());
         //rootGrid.getChildren().add(openSourceCatalogBtn);
         
         primaryStage.setScene(primaryScene);
         primaryStage.show();
-        
-        
-        
     }
     
 	private void chooseFile(String fileChooseMode){
