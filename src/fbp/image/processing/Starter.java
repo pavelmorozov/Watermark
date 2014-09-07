@@ -1,5 +1,7 @@
 package fbp.image.processing;
 
+import java.io.File;
+
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -31,6 +33,8 @@ public class Starter extends Application{
 
 	private static final Integer SCALED_PREVIW_X = 192;
 	private static final Integer SCALED_PREVIW_Y = 288;
+
+	private ImageProcessorAWT imageProcessor;
 	
 	private Stage primaryStage;
 	
@@ -40,16 +44,15 @@ public class Starter extends Application{
 	}
 
     @Override
-    public void start(final Stage stage) {
+    public void start(final Stage stage) throws NumberFormatException, Exception {
     	
-		
+		imageProcessor = new ImageProcessorAWT();
+        /////////////////////////////////////////////////////////////////////////////
+        // Visual UI controls creation
+        /////////////////////////////////////////////////////////////////////////////		
     	
     	primaryStage = stage;
-    	
         primaryStage.setTitle(APP_CAPTION);
-        
-        
-        
 //        Button openSourceCatalogBtn = new Button();
 //        openSourceCatalogBtn.setText("Open source catalog");
 //        openSourceCatalogBtn.setOnAction(new EventHandler<ActionEvent>() {
@@ -61,9 +64,8 @@ public class Starter extends Application{
 ////                fileChooser.showOpenDialog(primaryStage);                
 //            }
 //        });
-        
-        //StackPane rootStackPane = new StackPane();
         GridPane rootGrid = new GridPane();
+        rootGrid.setId("rootGrid");
         rootGrid.setGridLinesVisible(true);
         rootGrid.setHgap(10);
         rootGrid.setVgap(10);
@@ -77,6 +79,7 @@ public class Starter extends Application{
         rootGrid.add(sourceLabel, 0, 1);
 
         TextField sourceField = new TextField();
+        sourceField.setId("sourceField");
         rootGrid.add(sourceField, 1, 1, 2, 1);
         
         Button chooseSourceBtn = new Button();
@@ -87,6 +90,7 @@ public class Starter extends Application{
         rootGrid.add(destinationLabel, 0, 2);
 
         TextField outputField = new TextField ();
+        outputField.setId("outputField");
         rootGrid.add(outputField, 1, 2, 2, 1);
         
         Button chooseDestinationBtn = new Button();
@@ -131,7 +135,6 @@ public class Starter extends Application{
         choosePreviewNextBtn.setText("- > -");
         rootGrid.add(choosePreviewNextBtn, 2, 7);        
         
-        
 //        Image verticalBlankImage = new Image("file:img/vertical.jpg");
         Image testImage = new Image("file:output/1.original.jpg");
         
@@ -145,9 +148,6 @@ public class Starter extends Application{
         verticalGraphicsContext.setFill(Color.web("#ffffff",1));
         //verticalGraphicsContext.fillOval(10, 60, 30, 30);
         verticalGraphicsContext.fillRect(0, 0, SCALED_PREVIW_X, SCALED_PREVIW_Y);
-        //verticalGraphicsContext.drawImage(arg0, arg1, arg2);
-//        verticalGraphicsContext.drawImage
-//        	(testImage, 0, 0, SCALED_PREVIW_X, SCALED_PREVIW_Y);
         rootGrid.add(verticalCanvas, 0, 8, 3, 1);
 
         Canvas horizontalCanvas = new Canvas (SCALED_PREVIW_Y, SCALED_PREVIW_X);
@@ -160,15 +160,54 @@ public class Starter extends Application{
         GraphicsContext mainGraphicsContext = mainCanvas.getGraphicsContext2D();
         mainGraphicsContext.setFill(Color.web("#777777",1));
         mainGraphicsContext.fillRect(0, 0, IMAGE_SIZE_H, IMAGE_SIZE_H);
+        
+        /////////////////////////////////////////////////////////////////////////////
+        // Initial fields settings
+        /////////////////////////////////////////////////////////////////////////////
+        
+        sourceField.setText("D:\\java\\projects\\Watermark");
+        outputField.setText("d:\\java\\projects\\watermark\\output");
+        watermarkTextField.setText("=== <Watermark text> ===");
+        watermarkFontSizeField.setText("16");
+        watermarkOpacityField.setText("0.4");
+        previewFileField.setText("1.original.jpg");
+        
+        /////////////////////////////////////////////////////////////////////////////
+        // Open image from initial settings
+        /////////////////////////////////////////////////////////////////////////////		
+        
+        double x = 0;
+        double y = 0;        
+        
+//        String imagePath = "file:" + sourceField.getText()+"\\"+
+//        		previewFileField.getText();
+//        Image imageToDraw = new Image(imagePath);
+        Image imageToDraw = imageProcessor.processImage(
+        		new File(sourceField.getText()+"\\\\"+previewFileField.getText()),
+        		watermarkTextField.getText(),
+        		Integer.parseInt(watermarkFontSizeField.getText()),
+    			Double.parseDouble(watermarkOpacityField.getText().replace(',', '.')));
+        
+        //System.out.println("height: "+imageToDraw.getHeight());
+        //System.out.println("imagePath: "+imagePath);
+        
+        if (imageToDraw.getWidth()<imageToDraw.getHeight()){
+        	//vertical align
+        	x = (mainCanvas.getWidth() - imageToDraw.getWidth())/2;
+        	y = 0;
+        } else {
+        	//horizontal align
+        	x = 0;
+        	y = (mainCanvas.getHeight() - imageToDraw.getHeight())/2;
+        }
+        
         mainGraphicsContext.drawImage
-        	(testImage, 0, 0, IMAGE_SIZE_W, IMAGE_SIZE_H);        
+        	(imageToDraw, x, y, imageToDraw.getWidth(), imageToDraw.getHeight());        
         
         rootGrid.add(mainCanvas, 4, 0, 1, 10);        
         
 //        root.getChildren().add(btn);
         Scene primaryScene = new Scene(rootGrid, 1100, 725);
-
-        InitialSettings initialSettings = new InitialSettings(rootGrid);
         
         primaryScene.getStylesheets().add(Starter.class.getResource("ui.css").toExternalForm());
         //rootGrid.getChildren().add(openSourceCatalogBtn);
@@ -186,4 +225,9 @@ public class Starter extends Application{
 	     
 	    }
 	}
+	
+	
+    
+		
+	
 }

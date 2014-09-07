@@ -15,6 +15,9 @@ import java.util.Calendar;
 import java.util.HashSet;
 import java.util.Set;
 
+import javafx.embed.swing.SwingFXUtils;
+import javafx.scene.image.Image;
+
 import javax.imageio.ImageIO;
 
 import org.imgscalr.Scalr;
@@ -22,28 +25,32 @@ import org.imgscalr.Scalr;
 public class ImageProcessorAWT {
 	private final static int IMAGE_SIZE_H = 720;
 	private final static int IMAGE_SIZE_W = 480;
-	private final static String WATERMARK_TEXT = "=== < Watermark > ===";
+	//private final static String WATERMARK_TEXT = "=== < Watermark > ===";
 	
 	public ImageProcessorAWT()  throws Exception {
-		startRocessing();
+		//startRocessing();
 	}
 	
-	private void startRocessing()  throws Exception {
-		Calendar cal = Calendar.getInstance();
+	public Image processImage(
+			File fileToRead,
+			String watermarkText,
+			int fontSize,
+			double opacity) throws Exception {
+		//Calendar cal = Calendar.getInstance();
 		//cal.getTime();
-		SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss:SSS");
-		System.out.println("######### File conversion #########");
-		System.out.println(sdf.format(cal.getTime()) +" - Started" );
+		//SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss:SSS");
+		//System.out.println("######### File conversion #########");
+		//System.out.println(sdf.format(cal.getTime()) +" - Started" );
 
-		Set<BufferedImage> sourceImageSet = new HashSet<BufferedImage>();    	
-		
-		FileProcessor fileProcessor = new FileProcessor();  
-		Set<File> imageSet = fileProcessor.listFiles("");
-		
-		for (File imageFile:imageSet){
+//		Set<BufferedImage> sourceImageSet = new HashSet<BufferedImage>();    	
+//		
+//		FileProcessor fileProcessor = new FileProcessor();  
+//		Set<File> imageSet = fileProcessor.listFiles("");
+//		
+//		for (File imageFile:imageSet){
 			//String exportFileName = "export_"+imageFile.getName();
 			
-			BufferedImage sourceImage = ImageIO.read(imageFile);
+			BufferedImage sourceImage = ImageIO.read(fileToRead);
 			int imageWidth = sourceImage.getWidth();
 			int imageHeight = sourceImage.getHeight();
 			
@@ -70,8 +77,8 @@ public class ImageProcessorAWT {
 	                 RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 
 		    // create watermark text shape for rendering
-	        Font font = new Font(Font.SANS_SERIF, Font.PLAIN, 24);
-	        GlyphVector fontGV = font.createGlyphVector(g2d.getFontRenderContext(), WATERMARK_TEXT);
+	        Font font = new Font(Font.SANS_SERIF, Font.PLAIN, fontSize);
+	        GlyphVector fontGV = font.createGlyphVector(g2d.getFontRenderContext(), watermarkText);
 	        Rectangle size = fontGV.getPixelBounds(g2d.getFontRenderContext(), 0, 0);
 	        Shape textShape = fontGV.getOutline();
 	        double textWidth = size.getWidth();
@@ -80,7 +87,7 @@ public class ImageProcessorAWT {
 	        Shape rotatedText = rotate45.createTransformedShape(textShape);
 	        //Shape rotatedText = textShape;
 
-	        g2d.setColor(new Color(120,120,120,70));
+	        g2d.setColor(new Color(120,120,120,(int)(opacity*255)));
 	        //g2d.setStroke(new BasicStroke(1f));
 	        
 	        double yStep = Math.sqrt(textWidth * textWidth / 2)/2;
@@ -97,11 +104,13 @@ public class ImageProcessorAWT {
 	            g2d.translate(xStep*5, -(y + yStep));
 	        }
 			
-			ImageIO.write(destinationImage, "jpg", new File(fileProcessor.getOutputFolderName()+'/'+imageFile.getName()));
-			System.out.println("File exported: " + imageFile.getName());
-		}
-		cal = Calendar.getInstance();
-		System.out.println(sdf.format(cal.getTime()) +" - Finished" );
+			ImageIO.write(destinationImage, "jpg", new File(fileToRead.getPath()+".xxx"));
+			System.out.println("File processed: " + fileToRead.getPath());
+			Image image = SwingFXUtils.toFXImage(destinationImage, null);
+			return image;
+//		}
+//		cal = Calendar.getInstance();
+//		System.out.println(sdf.format(cal.getTime()) +" - Finished" );
 		
 	}
 }
