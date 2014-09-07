@@ -66,7 +66,7 @@ public class Starter extends Application{
 //        });
         GridPane rootGrid = new GridPane();
         rootGrid.setId("rootGrid");
-        rootGrid.setGridLinesVisible(true);
+        //rootGrid.setGridLinesVisible(true);
         rootGrid.setHgap(10);
         rootGrid.setVgap(10);
         rootGrid.setPadding(new Insets(5, 5, 5, 5));
@@ -145,20 +145,20 @@ public class Starter extends Application{
         
         Canvas verticalCanvas = new Canvas (SCALED_PREVIW_X, SCALED_PREVIW_Y);
         GraphicsContext verticalGraphicsContext = verticalCanvas.getGraphicsContext2D();
-        verticalGraphicsContext.setFill(Color.web("#ffffff",1));
+        verticalGraphicsContext.setFill(Color.web("#F1DFC7",1));
         //verticalGraphicsContext.fillOval(10, 60, 30, 30);
         verticalGraphicsContext.fillRect(0, 0, SCALED_PREVIW_X, SCALED_PREVIW_Y);
         rootGrid.add(verticalCanvas, 0, 8, 3, 1);
 
         Canvas horizontalCanvas = new Canvas (SCALED_PREVIW_Y, SCALED_PREVIW_X);
         GraphicsContext horizontalGraphicsContext = horizontalCanvas.getGraphicsContext2D();
-        horizontalGraphicsContext.setFill(Color.web("#ffffff",1));
+        horizontalGraphicsContext.setFill(Color.web("#F1DFC7",1));
         horizontalGraphicsContext.fillRect(0, 0, SCALED_PREVIW_Y, SCALED_PREVIW_X);
         rootGrid.add(horizontalCanvas, 0, 9, 5, 1);
         
         Canvas mainCanvas = new Canvas (IMAGE_SIZE_H, IMAGE_SIZE_H);
         GraphicsContext mainGraphicsContext = mainCanvas.getGraphicsContext2D();
-        mainGraphicsContext.setFill(Color.web("#777777",1));
+        mainGraphicsContext.setFill(Color.web("#F1DFC7",1));
         mainGraphicsContext.fillRect(0, 0, IMAGE_SIZE_H, IMAGE_SIZE_H);
         
         /////////////////////////////////////////////////////////////////////////////
@@ -171,18 +171,21 @@ public class Starter extends Application{
         watermarkFontSizeField.setText("16");
         watermarkOpacityField.setText("0.4");
         previewFileField.setText("1.original.jpg");
+
+        /////////////////////////////////////////////////////////////////////////////
+        // Draw watermark preview on vertical and horizontal
+        /////////////////////////////////////////////////////////////////////////////        
         
         /////////////////////////////////////////////////////////////////////////////
         // Open image from initial settings
         /////////////////////////////////////////////////////////////////////////////		
         
-        double x = 0;
-        double y = 0;        
+        //verticalGraphicsContext.
         
 //        String imagePath = "file:" + sourceField.getText()+"\\"+
 //        		previewFileField.getText();
 //        Image imageToDraw = new Image(imagePath);
-        Image imageToDraw = imageProcessor.processImage(
+        Image imageToDraw = imageProcessor.processImageFromFile(
         		new File(sourceField.getText()+"\\\\"+previewFileField.getText()),
         		watermarkTextField.getText(),
         		Integer.parseInt(watermarkFontSizeField.getText()),
@@ -190,6 +193,7 @@ public class Starter extends Application{
         
         //System.out.println("height: "+imageToDraw.getHeight());
         //System.out.println("imagePath: "+imagePath);
+        double x = 0; double y = 0;
         
         if (imageToDraw.getWidth()<imageToDraw.getHeight()){
         	//vertical align
@@ -203,15 +207,14 @@ public class Starter extends Application{
         
         mainGraphicsContext.drawImage
         	(imageToDraw, x, y, imageToDraw.getWidth(), imageToDraw.getHeight());        
-        
         rootGrid.add(mainCanvas, 4, 0, 1, 10);        
         
-//        root.getChildren().add(btn);
-        Scene primaryScene = new Scene(rootGrid, 1100, 725);
+        /////////////////////////////////////////////////////////////////////////////
+        // Create primaryScene and show primaryStage
+        /////////////////////////////////////////////////////////////////////////////		
         
+        Scene primaryScene = new Scene(rootGrid, 1100, 730);
         primaryScene.getStylesheets().add(Starter.class.getResource("ui.css").toExternalForm());
-        //rootGrid.getChildren().add(openSourceCatalogBtn);
-        
         primaryStage.setScene(primaryScene);
         primaryStage.show();
     }
