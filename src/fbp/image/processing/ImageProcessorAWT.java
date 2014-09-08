@@ -15,6 +15,8 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
@@ -50,7 +52,11 @@ public class ImageProcessorAWT {
 	}
 	
 	public void setFontSize(int fontSize){
-		this.fontSize = fontSize;
+		if (( fontSize > 15 ) && (fontSize < 100)){ 
+			this.fontSize = fontSize;
+		}else{
+			this.fontSize = 16;
+		}
 	}
 
 	public int getFontSize(){
@@ -58,7 +64,11 @@ public class ImageProcessorAWT {
 	}
 	
 	public void setOpacity(double opacity){
-		this.opacity = opacity;
+		if (( opacity >= 0 ) && (opacity <= 1)){ 
+			this.opacity = opacity;
+		}else{
+			this.opacity = 1;
+		}
 	}
 	
 	public double getOpacity(){
@@ -76,7 +86,7 @@ public class ImageProcessorAWT {
 		System.out.println("Image to process: "+fileName);
 	}
 
-	public void setImagesFolder(String sourceFolder){
+	public void setSourceFolder(String sourceFolder){
 		this.sourceFolder = sourceFolder;
 	}
 
@@ -87,9 +97,9 @@ public class ImageProcessorAWT {
     /////////////////////////////////////////////////////////////////////////////
     // Processor commands
     /////////////////////////////////////////////////////////////////////////////
-	public void processImage(){
+	public Image processImage(){
 		BufferedImage sourceImage = null;
-		SwingFXUtils.fromFXImage(imageToProcess, sourceImage);
+		sourceImage = SwingFXUtils.fromFXImage(imageToProcess, null);
 		
 		int imageWidth = sourceImage.getWidth();
 		int imageHeight = sourceImage.getHeight();
@@ -118,6 +128,7 @@ public class ImageProcessorAWT {
 
 	    // create watermark text shape for rendering
         Font font = new Font(Font.SANS_SERIF, Font.PLAIN, fontSize);
+
         GlyphVector fontGV = font.createGlyphVector(g2d.getFontRenderContext(), watermarkText);
         Rectangle size = fontGV.getPixelBounds(g2d.getFontRenderContext(), 0, 0);
         Shape textShape = fontGV.getOutline();
@@ -132,6 +143,11 @@ public class ImageProcessorAWT {
         
         double yStep = Math.sqrt(textWidth * textWidth / 2)/2;
         double xStep = textHeight * 3;
+
+        if ((yStep == 0)||(xStep == 0)) { 
+        	imageProcessed = SwingFXUtils.toFXImage(destinationImage, null);
+        	return imageProcessed;
+        }
         
         // step over image rendering watermark text
         for (double x = -xStep ; x < destinationImage.getWidth(); x += xStep) {
@@ -145,21 +161,22 @@ public class ImageProcessorAWT {
         }
 		System.out.println("image processed");
 		imageProcessed = SwingFXUtils.toFXImage(destinationImage, null);
+		return imageProcessed; 
 	}
 
-	public void processFolder() throws IOException{
+	public void processFolder() throws Exception{
 		Calendar cal = Calendar.getInstance();
 		cal.getTime();
 		SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss:SSS");
 		System.out.println("######### Folder conversion #########");
 		System.out.println(sdf.format(cal.getTime()) +" - Started" );
-
-		Set<BufferedImage> sourceImageSet = new HashSet<BufferedImage>();    	
 		
-		FileProcessor fileProcessor = new FileProcessor();  
-		Set<File> imageSet = fileProcessor.listFiles("");
+		FileProcessor fileProcessor = new FileProcessor();
+		fileProcessor.setSourceFolderString(sourceFolder);
+		fileProcessor.listFiles();
+		SortedSet<File> imageFileSet = fileProcessor.getFileSet();
 		
-		for (File imageFile:imageSet){
+		for (File imageFile:imageFileSet){
 			setImageToProcessFromFile(imageFile.getAbsolutePath());
 			processImage();
 			saveImageProcessed();
