@@ -308,20 +308,24 @@ public class Starter extends Application{
 //	        	Thread imageProcessThread = new Thread(imageProcessor);
 //	        	imageProcessThread.start();
 	        	
+	        	//imageProcessor.
 	        	
-	        	final ImageProcessorAWT ip = imageProcessor;
+	        	statusLabel.textProperty().bind(imageProcessor.messageProperty());
+	        	new Thread(imageProcessor).start();
 	        	
-	        	processFolderTask = new Task<Void>(){
-	    			@Override
-	    			protected Void call() throws Exception {
-			        	try {
-			        		ip.processFolderConcurent();
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
-			        	return null;
-	    			}
-	    		};
+//	        	final ImageProcessorAWT ip = imageProcessor;
+//	        	
+//	        	processFolderTask = new Task<Void>(){
+//	        		 @Override 
+//	        		 public Void call() throws Exception {
+//			        	try {
+//			        		ip.processFolderConcurent();
+//						} catch (Exception e) {
+//							e.printStackTrace();
+//						}
+//			        	return null;
+//	    			}
+//	    		};
 
 	        }
 		});

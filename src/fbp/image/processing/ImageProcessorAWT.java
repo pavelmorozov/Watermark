@@ -24,7 +24,7 @@ import javax.imageio.ImageIO;
 
 import org.imgscalr.Scalr;
 
-public class ImageProcessorAWT  implements Runnable{
+public class ImageProcessorAWT extends Task{
 	private final static int IMAGE_SIZE_H = 720;
 	private final static int IMAGE_SIZE_W = 480;
 	private String watermarkText;
@@ -38,7 +38,7 @@ public class ImageProcessorAWT  implements Runnable{
 	private Label statusLabel;
 	private Task processFolderTask;
 	
-	public ImageProcessorAWT()  throws Exception {
+	public ImageProcessorAWT() throws Exception {
 	}
 	
     /////////////////////////////////////////////////////////////////////////////
@@ -193,7 +193,6 @@ public class ImageProcessorAWT  implements Runnable{
 		final SortedSet<File> imageFileSet = fileProcessor.getFileSet();
 		System.out.println(imageFileSet.size());
 		
-		
 		for (File imageFile:imageFileSet){
 			setImageToProcessFromFile(imageFile.getAbsolutePath());
 			System.out.println(imageFileSet.headSet(imageFile).size());
@@ -202,7 +201,6 @@ public class ImageProcessorAWT  implements Runnable{
 			processImage();
 			saveImageProcessed();
 		}
-				
 		
         statusLabel.textProperty().bind(processFolderTask.messageProperty());
 		processFolderTask.run();
@@ -340,14 +338,20 @@ public class ImageProcessorAWT  implements Runnable{
 		
 	}
 
+//	@Override
+//	public void run() {
+//		try {
+//			processFolder();
+//		} catch (Exception e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//	}
+
 	@Override
-	public void run() {
-		try {
-			processFolder();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+	protected Object call() throws Exception {
+		processFolderConcurent();
+		return null;
 	}
 }
 
