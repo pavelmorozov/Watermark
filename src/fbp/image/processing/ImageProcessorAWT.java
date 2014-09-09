@@ -31,8 +31,8 @@ public class ImageProcessorAWT {
 	private String watermarkText;
 	private int fontSize;
 	private double opacity;
-	private Image imageToProcess;
-	private Image imageProcessed;
+	private BufferedImage imageToProcess;
+	private BufferedImage imageProcessed;
 	private String sourceFolder;
 	private String outputFolder;
 	private String imageFileName;
@@ -76,14 +76,19 @@ public class ImageProcessorAWT {
 	}
 	
 	public void setImageToProcess(Image imageToProcess){
-		this.imageToProcess = imageToProcess;
+		this.imageToProcess = SwingFXUtils.fromFXImage(imageToProcess, null);
 	}
 
 	public void setImageToProcessFromFile(String fileName){
-		Image imageToProcess = new Image("file:"+fileName);
-		this.imageToProcess = imageToProcess; 
-		imageFileName = new File(fileName).getName();
-		System.out.println("Image to process: "+fileName);
+		File imageFile = new File(fileName);
+		try {
+			this.imageToProcess = ImageIO.read(imageFile);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		imageFileName = imageFile.getName();
+		System.out.println("Set image to process: "+fileName);
 	}
 
 	public void setSourceFolder(String sourceFolder){
@@ -97,12 +102,12 @@ public class ImageProcessorAWT {
     /////////////////////////////////////////////////////////////////////////////
     // Processor commands
     /////////////////////////////////////////////////////////////////////////////
-	public Image processImage(){
-		BufferedImage sourceImage = null;
-		sourceImage = SwingFXUtils.fromFXImage(imageToProcess, null);
+	public BufferedImage processImage(){
+//		BufferedImage sourceImage = null;
+//		sourceImage = SwingFXUtils.fromFXImage(imageToProcess, null);
 		
-		int imageWidth = sourceImage.getWidth();
-		int imageHeight = sourceImage.getHeight();
+		int imageWidth = imageToProcess.getWidth();
+		int imageHeight = imageToProcess.getHeight();
 		
 		int exportImageWidth, exportImageHeight;
 		
@@ -115,7 +120,7 @@ public class ImageProcessorAWT {
 		}
 		
 		BufferedImage destinationImage = Scalr.resize(
-				sourceImage, 
+				imageToProcess, 
 				Scalr.Method.SPEED,
 				Scalr.Mode.FIT_TO_WIDTH,
 				exportImageWidth, exportImageHeight, 
@@ -138,14 +143,14 @@ public class ImageProcessorAWT {
         Shape rotatedText = rotate45.createTransformedShape(textShape);
         //Shape rotatedText = textShape;
 
-        g2d.setColor(new Color(120,120,120,(int)(opacity*255)));
+        g2d.setColor(new Color(200,200,200,(int)(opacity*255)));
         //g2d.setStroke(new BasicStroke(1f));
         
         double yStep = Math.sqrt(textWidth * textWidth / 2)/2;
         double xStep = textHeight * 3;
 
         if ((yStep == 0)||(xStep == 0)) { 
-        	imageProcessed = SwingFXUtils.toFXImage(destinationImage, null);
+        	imageProcessed = destinationImage;
         	return imageProcessed;
         }
         
@@ -160,7 +165,8 @@ public class ImageProcessorAWT {
             g2d.translate(xStep*5, -(y + yStep));
         }
 		System.out.println("image processed");
-		imageProcessed = SwingFXUtils.toFXImage(destinationImage, null);
+		//imageProcessed = SwingFXUtils.toFXImage(destinationImage, null);
+		imageProcessed = destinationImage;
 		return imageProcessed; 
 	}
 
@@ -181,17 +187,28 @@ public class ImageProcessorAWT {
 			processImage();
 			saveImageProcessed();
 		}
+		cal = Calendar.getInstance();
+		System.out.println(sdf.format(cal.getTime()) +" - Finished" );		
 	}	
     /////////////////////////////////////////////////////////////////////////////
     // Get processed images
     /////////////////////////////////////////////////////////////////////////////
 	public Image getImageProcessed(){
-		return imageProcessed;
+		return SwingFXUtils.toFXImage(imageProcessed, null);
 	}	
 	
 	public void saveImageProcessed() throws IOException{
-		ImageIO.write(SwingFXUtils.fromFXImage(imageProcessed, null), "jpg", 
+		ImageIO.write(imageProcessed, "jpg", 
 				new File(outputFolder+"\\\\"+imageFileName));
+//		BufferedImage imageToSave = SwingFXUtils.fromFXImage(imageProcessed, null);
+//		BufferedImage imageRGB = new BufferedImage(imageToSave.getWidth(), imageToSave.getHeight(), BufferedImage.OPAQUE); // Remove alpha-channel from buffered image.
+//		Graphics2D graphics = imageRGB.createGraphics();
+//		graphics.drawImage(image, 0, 0, null);
+//		ImageIO.write(imageRGB, "jpg", new File("/mydir/foto.jpg"));
+//		graphics.dispose();		
+//		
+//		ImageIO.write(, "jpg", 
+//				new File(outputFolder+"\\\\"+imageFileName));
 	}
 	
 	public Image processImageFromFile(
@@ -278,3 +295,4 @@ public class ImageProcessorAWT {
 		
 	}
 }
+

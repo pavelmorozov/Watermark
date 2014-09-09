@@ -86,7 +86,7 @@ public class Starter extends Application{
 
         GridPane rootGrid = new GridPane();
         rootGrid.setId("rootGrid");
-        rootGrid.setGridLinesVisible(true);
+        //rootGrid.setGridLinesVisible(true);
         rootGrid.setHgap(10);
         rootGrid.setVgap(10);
         rootGrid.setPadding(new Insets(5, 5, 5, 5));
@@ -159,17 +159,9 @@ public class Starter extends Application{
         processFolderStartBtn.setText("Start");
         rootGrid.add(processFolderStartBtn, 3, 7);
         
-        processFolderStopBtn = new Button();
-        processFolderStopBtn.setText("Stop");
-        rootGrid.add(processFolderStopBtn, 4, 7);        
-        
-//        Image verticalBlankImage = new Image("file:img/vertical.jpg");
-        //Image testImage = new Image("file:output/1.original.jpg");
-        
-//        ImageView verticalImageView = new ImageView(); 
-//        verticalImageView.setImage(verticalBlankImage);
-//        
-//        rootGrid.add(verticalImageView, 0, 6);        
+//        processFolderStopBtn = new Button();
+//        processFolderStopBtn.setText("Stop");
+//        rootGrid.add(processFolderStopBtn, 4, 7);        
         
         verticalCanvas = new Canvas (SCALED_PREVIW_X, SCALED_PREVIW_Y);
         verticalGraphicsContext = verticalCanvas.getGraphicsContext2D();
@@ -309,6 +301,8 @@ public class Starter extends Application{
         imageProcessor.setWatermarkText(watermarkTextField.getText());
         imageProcessor.setFontSize(Integer.parseInt(watermarkFontSizeField.getText()));
         imageProcessor.setOpacity(Double.parseDouble(watermarkOpacityField.getText().replace(',', '.')));
+        imageProcessor.setSourceFolder(sourceField.getText());
+        imageProcessor.setOutputFolder(outputField.getText());
 
         verticalGraphicsContext.setFill(Color.web("#F1DFC7",1));
         verticalGraphicsContext.fillRect(0, 0, SCALED_PREVIW_X, SCALED_PREVIW_Y);
