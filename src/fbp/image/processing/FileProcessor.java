@@ -9,9 +9,9 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-public class FileProcessor {
-	String sourceFolderString;
-	SortedSet<File> fileSet;
+public class FileProcessor{
+	private String sourceFolderString;
+	private SortedSet<File> fileSet;
 
 	FileProcessor() {
 	}
@@ -25,7 +25,6 @@ public class FileProcessor {
 	}
 
 	public void listFiles() {
-		// ########## Here change to initialFolder ##########
 		// workDirectory = System.getProperty("user.dir");
 		//
 		// System.out.println("Working Directory: " +
@@ -49,6 +48,7 @@ public class FileProcessor {
 
 					// get extension
 					String str = name.substring(lastIndex);
+					str = str.toLowerCase();
 
 					// match path name extension
 					if (str.equals(".jpg")) {
@@ -76,8 +76,11 @@ public class FileProcessor {
 		File[] filesInDir = sourceDirectoryFile.listFiles(fileNameFilter);
 
 		// get a listing of all files in the directory
-		fileSet = new TreeSet<File>(Arrays.asList(filesInDir));
-		System.out.println("found files:" + fileSet.size());
+		try{
+			fileSet = new TreeSet<File>(Arrays.asList(filesInDir));
+			System.out.println("found files:" + fileSet.size());
+		}catch(Exception e){
+			System.out.println(e);
+		}
 	}
-
 }

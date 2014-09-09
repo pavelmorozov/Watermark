@@ -13,19 +13,18 @@ import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.SortedSet;
-import java.util.TreeSet;
 
+import javafx.concurrent.Task;
 import javafx.embed.swing.SwingFXUtils;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 
 import javax.imageio.ImageIO;
 
 import org.imgscalr.Scalr;
 
-public class ImageProcessorAWT {
+public class ImageProcessorAWT  implements Runnable{
 	private final static int IMAGE_SIZE_H = 720;
 	private final static int IMAGE_SIZE_W = 480;
 	private String watermarkText;
@@ -36,6 +35,8 @@ public class ImageProcessorAWT {
 	private String sourceFolder;
 	private String outputFolder;
 	private String imageFileName;
+	private Label statusLabel;
+	private Task processFolderTask;
 	
 	public ImageProcessorAWT()  throws Exception {
 	}
@@ -43,12 +44,21 @@ public class ImageProcessorAWT {
     /////////////////////////////////////////////////////////////////////////////
     // Initial settings
     /////////////////////////////////////////////////////////////////////////////
+	
+	public void setProcessFolderTask(Task processFolderTask){
+		this.processFolderTask = processFolderTask;
+	}
+	
 	public void setWatermarkText(String watermarkText){
 		this.watermarkText = watermarkText;
 	}
 	
 	public String getWatermarkText(){
 		return watermarkText;
+	}
+	
+	public void setStatusLabel(Label statusLabel){
+		this.statusLabel = statusLabel;
 	}
 	
 	public void setFontSize(int fontSize){
@@ -169,6 +179,38 @@ public class ImageProcessorAWT {
 		imageProcessed = destinationImage;
 		return imageProcessed; 
 	}
+	
+	public void processFolderConcurent() throws IOException{
+		Calendar cal = Calendar.getInstance();
+		cal.getTime();
+		SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss:SSS");
+		System.out.println("######### Folder conversion #########");
+		System.out.println(sdf.format(cal.getTime()) +" - Started" );
+		
+		FileProcessor fileProcessor = new FileProcessor();
+		fileProcessor.setSourceFolderString(sourceFolder);
+		fileProcessor.listFiles();
+		final SortedSet<File> imageFileSet = fileProcessor.getFileSet();
+		System.out.println(imageFileSet.size());
+		
+		
+		for (File imageFile:imageFileSet){
+			setImageToProcessFromFile(imageFile.getAbsolutePath());
+			System.out.println(imageFileSet.headSet(imageFile).size());
+			//statusLabel.setText(Integer.toString(imageFileSet.headSet(imageFile).size()));
+			updateMessage("Iteration " + imageFileSet.headSet(imageFile).size());
+			processImage();
+			saveImageProcessed();
+		}
+				
+		
+        statusLabel.textProperty().bind(processFolderTask.messageProperty());
+		processFolderTask.run();
+
+		cal = Calendar.getInstance();
+		System.out.println(sdf.format(cal.getTime()) +" - Finished" );		
+		
+	}
 
 	public void processFolder() throws Exception{
 		Calendar cal = Calendar.getInstance();
@@ -181,9 +223,12 @@ public class ImageProcessorAWT {
 		fileProcessor.setSourceFolderString(sourceFolder);
 		fileProcessor.listFiles();
 		SortedSet<File> imageFileSet = fileProcessor.getFileSet();
+		System.out.println(imageFileSet.size());
 		
 		for (File imageFile:imageFileSet){
 			setImageToProcessFromFile(imageFile.getAbsolutePath());
+			System.out.println(imageFileSet.headSet(imageFile).size());
+			//statusLabel.setText(Integer.toString(imageFileSet.headSet(imageFile).size()));
 			processImage();
 			saveImageProcessed();
 		}
@@ -293,6 +338,16 @@ public class ImageProcessorAWT {
 //		cal = Calendar.getInstance();
 //		System.out.println(sdf.format(cal.getTime()) +" - Finished" );
 		
+	}
+
+	@Override
+	public void run() {
+		try {
+			processFolder();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 }
 

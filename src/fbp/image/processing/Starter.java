@@ -2,10 +2,12 @@ package fbp.image.processing;
 
 import java.io.File;
 import java.util.SortedSet;
+import java.util.prefs.Preferences;
 
 import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -21,8 +23,10 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 
 public class Starter extends Application{
 
@@ -40,6 +44,9 @@ public class Starter extends Application{
 	private static final Integer SCALED_PREVIW_Y = 288;
 	private ImageProcessorAWT imageProcessor;
 	private Stage primaryStage;
+	private Task processFolderTask;
+	
+	private Preferences preferences;
 	
 	FileProcessor fileProcessor;
 	
@@ -61,12 +68,16 @@ public class Starter extends Application{
     	horizontalCanvas,
     	mainCanvas;
     Button
+    	chooseSourceBtn,
+    	chooseDestinationBtn,
 	    choosePreviewFileBtn,
 	    choosePreviewPrevBtn,
 	    choosePreviewNextBtn,
 	    processFolderStartBtn,
     	processFolderStopBtn;
-	
+    Label
+    	statusLabel;
+    
 	public static void main(String[] args) throws Exception {
 		//new ImageProcessorAWT();
 		launch(args);
@@ -74,7 +85,7 @@ public class Starter extends Application{
 
     @Override
     public void start(final Stage stage) throws NumberFormatException, Exception {
-    	
+    	preferences = Preferences.userRoot().node(this.getClass().getName());
 		imageProcessor = new ImageProcessorAWT();
 		fileProcessor = new FileProcessor();
         /////////////////////////////////////////////////////////////////////////////
@@ -102,7 +113,7 @@ public class Starter extends Application{
         sourceField.setId("sourceField");
         rootGrid.add(sourceField, 1, 1, 4, 1);
         
-        Button chooseSourceBtn = new Button();
+        chooseSourceBtn = new Button();
         chooseSourceBtn.setText("...");
         rootGrid.add(chooseSourceBtn, 5, 1);
 
@@ -113,7 +124,7 @@ public class Starter extends Application{
         outputField.setId("outputField");
         rootGrid.add(outputField, 1, 2, 4, 1);
         
-        Button chooseDestinationBtn = new Button();
+        chooseDestinationBtn = new Button();
         chooseDestinationBtn.setText("...");
         rootGrid.add(chooseDestinationBtn, 5, 2);
 
@@ -161,7 +172,10 @@ public class Starter extends Application{
         
 //        processFolderStopBtn = new Button();
 //        processFolderStopBtn.setText("Stop");
-//        rootGrid.add(processFolderStopBtn, 4, 7);        
+//        rootGrid.add(processFolderStopBtn, 4, 7);
+        
+        statusLabel = new Label("Ready");
+        rootGrid.add(statusLabel, 4, 7);
         
         verticalCanvas = new Canvas (SCALED_PREVIW_X, SCALED_PREVIW_Y);
         verticalGraphicsContext = verticalCanvas.getGraphicsContext2D();
@@ -179,14 +193,16 @@ public class Starter extends Application{
         // Initial fields settings
         /////////////////////////////////////////////////////////////////////////////
         
-        sourceField.setText("D:\\java\\projects\\Watermark");
-        outputField.setText("d:\\java\\projects\\watermark\\output");
-        watermarkTextField.setText("=== <Watermark text> ===");
-        watermarkFontSizeField.setText("50");
-        watermarkOpacityField.setText("0.2");
-        previewFileField.setText("D:\\java\\projects\\Watermark\\1.original.jpg");
-        String sourceFolder = sourceField.getText();
-        fileProcessor.setSourceFolderString(sourceFolder);
+//        sourceField.setText("D:\\java\\projects\\Watermark");
+//        outputField.setText("d:\\java\\projects\\watermark\\output");
+//        watermarkTextField.setText("=== <Watermark text> ===");
+//        watermarkFontSizeField.setText("50");
+//        watermarkOpacityField.setText("0.2");
+//        previewFileField.setText("D:\\java\\projects\\Watermark\\1.original.jpg");
+        
+        getPreferences();
+
+        fileProcessor.setSourceFolderString(sourceField.getText());
         fileProcessor.listFiles();
         
         /////////////////////////////////////////////////////////////////////////////
@@ -263,7 +279,7 @@ public class Starter extends Application{
 	        		}
 	        		previousFile = imageFile;
 	        	}
-	        	redraw();
+	        	//redraw();
 	        }
 		});
 		choosePreviewNextBtn.setOnAction(new EventHandler<ActionEvent>() {
@@ -280,7 +296,7 @@ public class Starter extends Application{
 	        			currentFile = imageFile;
 	        		}
 	        	}
-	        	redraw();
+	        	//redraw();
 	        }
 		});
 		processFolderStartBtn.setOnAction(new EventHandler<ActionEvent>() {
@@ -288,13 +304,110 @@ public class Starter extends Application{
 	        public void handle(ActionEvent event){
 	        	imageProcessor.setSourceFolder(sourceField.getText());
 	        	imageProcessor.setOutputFolder(outputField.getText());
-	        	try {
-					imageProcessor.processFolder();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
+	        	//imageProcessor.processFolder();
+//	        	Thread imageProcessThread = new Thread(imageProcessor);
+//	        	imageProcessThread.start();
+	        	
+	        	
+	        	final ImageProcessorAWT ip = imageProcessor;
+	        	
+	        	processFolderTask = new Task<Void>(){
+	    			@Override
+	    			protected Void call() throws Exception {
+			        	try {
+			        		ip.processFolderConcurent();
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+			        	return null;
+	    			}
+	    		};
+
 	        }
 		});
+		
+    	chooseSourceBtn.setOnAction(new EventHandler<ActionEvent>() {
+	        @Override
+	        public void handle(ActionEvent event){
+	        	DirectoryChooser directoryChooser = new DirectoryChooser();
+	        	directoryChooser.setTitle("Choose source folder");
+	        	File initialDirectory = new File(sourceField.getText());
+	        	if(initialDirectory.exists() && initialDirectory.isDirectory()){
+	        		directoryChooser.setInitialDirectory(initialDirectory);
+	        	}
+	        	File file = directoryChooser.showDialog(primaryStage);
+	        	if (file != null) {
+	        		sourceField.setText(file.getPath());
+	        		fileProcessor.setSourceFolderString(file.getPath());
+	        		fileProcessor.listFiles();
+	        		SortedSet<File> fileSet = fileProcessor.getFileSet();
+	        		if (fileSet!=null){
+	        			previewFileField.setText(fileSet.first().getPath());
+	        		}
+	        	}
+	        	//redraw();
+	        }
+		});
+    	
+    	chooseDestinationBtn.setOnAction(new EventHandler<ActionEvent>() {
+	        @Override
+	        public void handle(ActionEvent event){
+	        	DirectoryChooser directoryChooser = new DirectoryChooser();
+	        	directoryChooser.setTitle("Choose output folder");
+	        	File initialDirectory = new File(outputField.getText());
+	        	if(initialDirectory.exists() && initialDirectory.isDirectory()){
+	        		directoryChooser.setInitialDirectory(initialDirectory);
+	        	}
+	        	File file = directoryChooser.showDialog(primaryStage);
+	        	if (file != null) {
+	        		outputField.setText(file.getPath());;
+	        	}	        	
+	        }
+		});
+    	
+    	choosePreviewFileBtn.setOnAction(new EventHandler<ActionEvent>() {
+	        @Override
+	        public void handle(ActionEvent event){
+	        	FileChooser fileChooser = new FileChooser();
+	        	fileChooser.setTitle("Choose file to preview");
+	        	File initialDirectory = new File(sourceField.getText());
+	        	if(initialDirectory.exists() && initialDirectory.isDirectory()){
+	        		fileChooser.setInitialDirectory(initialDirectory);
+	        	}	        	
+	        	File file = fileChooser.showOpenDialog(primaryStage);
+                if (file != null) {
+                	previewFileField.setText(file.getPath());
+                	sourceField.setText(file.getParent());
+	        		fileProcessor.setSourceFolderString(file.getParent());
+	        		fileProcessor.listFiles();
+                }
+                //redraw();
+	        }
+		});    	
+		
+		primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+	          public void handle(WindowEvent we) {
+	        	  setPreferences();
+	          }
+		});        		
+	}
+	
+	private void getPreferences(){
+		sourceField.setText(preferences.get("sourceField", ""));
+		outputField.setText(preferences.get("outputField", ""));
+		watermarkFontSizeField.setText(Integer.toString(preferences.getInt("watermarkFontSizeField", 0)));
+		watermarkOpacityField.setText(Double.toString(preferences.getDouble("watermarkOpacityField", 0.0)));
+		watermarkTextField.setText(preferences.get("watermarkTextField", ""));
+		previewFileField.setText(preferences.get("previewFileField", ""));
+	}
+
+	private void setPreferences(){
+        preferences.put("sourceField", sourceField.getText());
+        preferences.put("outputField", outputField.getText());
+        preferences.putInt("watermarkFontSizeField", Integer.parseInt(watermarkFontSizeField.getText()));
+        preferences.putDouble("watermarkOpacityField",Double.parseDouble(watermarkOpacityField.getText().replace(',', '.')));
+        preferences.put("watermarkTextField", watermarkTextField.getText());
+        preferences.put("previewFileField", previewFileField.getText());
 	}
 	
 	private void redraw(){
@@ -303,8 +416,10 @@ public class Starter extends Application{
         imageProcessor.setOpacity(Double.parseDouble(watermarkOpacityField.getText().replace(',', '.')));
         imageProcessor.setSourceFolder(sourceField.getText());
         imageProcessor.setOutputFolder(outputField.getText());
+        imageProcessor.setStatusLabel(statusLabel);
+        imageProcessor.setProcessFolderTask(processFolderTask);
 
-        verticalGraphicsContext.setFill(Color.web("#F1DFC7",1));
+        verticalGraphicsContext.setFill(Color.web("#ffffff",1));
         verticalGraphicsContext.fillRect(0, 0, SCALED_PREVIW_X, SCALED_PREVIW_Y);
         Image previewImage = verticalCanvas.snapshot(null, null);        
         imageProcessor.setImageToProcess(previewImage);
@@ -313,7 +428,7 @@ public class Starter extends Application{
         verticalGraphicsContext.drawImage
     		(previewImage, 0, 0, verticalCanvas.getWidth(), verticalCanvas.getHeight());
 
-        horizontalGraphicsContext.setFill(Color.web("#F1DFC7",1));
+        horizontalGraphicsContext.setFill(Color.web("#ffffff",1));
         horizontalGraphicsContext.fillRect(0, 0, SCALED_PREVIW_Y, SCALED_PREVIW_X);
         previewImage = horizontalCanvas.snapshot(null, null);
         imageProcessor.setImageToProcess(previewImage);
@@ -322,7 +437,7 @@ public class Starter extends Application{
         horizontalGraphicsContext.drawImage
     		(previewImage, 0, 0, horizontalCanvas.getWidth(), horizontalCanvas.getHeight());
         
-        mainGraphicsContext.setFill(Color.web("#F1DFC7",1));
+        mainGraphicsContext.setFill(Color.web("#555555",1));
         mainGraphicsContext.fillRect(0, 0, IMAGE_SIZE_H, IMAGE_SIZE_H);
         imageProcessor.setImageToProcessFromFile(previewFileField.getText());
         imageProcessor.processImage();
