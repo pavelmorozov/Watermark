@@ -1,11 +1,8 @@
 package fbp.image.processing;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.io.FilenameFilter;
 import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -25,17 +22,6 @@ public class FileProcessor{
 	}
 
 	public void listFiles() {
-		// workDirectory = System.getProperty("user.dir");
-		//
-		// System.out.println("Working Directory: " +
-		// workDirectory);
-		//
-		// System.out.println("Create folder: " +
-		// OUTPUT);
-		// boolean created = (new File(workDirectory+'/'+OUTPUT)).mkdirs();
-		// if (!created) System.out.println("Created sucessfully");
-		// else System.out.println("Folder not created. May be exist?");
-
 		// create a file that is really a directory
 		File sourceDirectoryFile = new File(sourceFolderString);
 
@@ -80,6 +66,7 @@ public class FileProcessor{
 			fileSet = new TreeSet<File>(Arrays.asList(filesInDir));
 			System.out.println("found files:" + fileSet.size());
 		}catch(Exception e){
+			fileSet = null;
 			System.out.println(e);
 		}
 	}

@@ -7,7 +7,7 @@ import java.util.prefs.Preferences;
 import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.concurrent.Task;
+import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -31,24 +31,13 @@ import javafx.stage.WindowEvent;
 public class Starter extends Application{
 
 	private static final String APP_CAPTION = "Resize & Watermark";
-	private static final String WORK_CATALOG = System.getProperty("user.dir");
-	private static final String VERTICAL_BLANK_NAME = System.getProperty("user.dir")
-			+"\\img\\vertical.jpg";
-	private static final String HORIZONTAL_BLANK_NAME = System.getProperty("user.dir")
-			+"\\img\\horizontal.jpg";
-	
 	private final static int IMAGE_SIZE_H = 720;
-	private final static int IMAGE_SIZE_W = 480;	
-
 	private static final Integer SCALED_PREVIW_X = 192;
 	private static final Integer SCALED_PREVIW_Y = 288;
 	private ImageProcessorAWT imageProcessor;
 	private Stage primaryStage;
-	private Task processFolderTask;
-	
 	private Preferences preferences;
-	
-	FileProcessor fileProcessor;
+	private FileProcessor fileProcessor;
 	
 	TextField 
 		sourceField,
@@ -79,7 +68,6 @@ public class Starter extends Application{
     	statusLabel;
     
 	public static void main(String[] args) throws Exception {
-		//new ImageProcessorAWT();
 		launch(args);
 	}
 
@@ -170,35 +158,28 @@ public class Starter extends Application{
         processFolderStartBtn.setText("Start");
         rootGrid.add(processFolderStartBtn, 3, 7);
         
-//        processFolderStopBtn = new Button();
-//        processFolderStopBtn.setText("Stop");
-//        rootGrid.add(processFolderStopBtn, 4, 7);
+        processFolderStopBtn = new Button();
+        processFolderStopBtn.setText("Stop");
+        rootGrid.add(processFolderStopBtn, 4, 7);
         
         statusLabel = new Label("Ready");
-        rootGrid.add(statusLabel, 4, 7);
+        rootGrid.add(statusLabel, 3, 8, 2, 1);
         
         verticalCanvas = new Canvas (SCALED_PREVIW_X, SCALED_PREVIW_Y);
         verticalGraphicsContext = verticalCanvas.getGraphicsContext2D();
-        rootGrid.add(verticalCanvas, 0, 8, 5, 1);
+        rootGrid.add(verticalCanvas, 0, 8, 5, 2);
 
         horizontalCanvas = new Canvas (SCALED_PREVIW_Y, SCALED_PREVIW_X);
         horizontalGraphicsContext = horizontalCanvas.getGraphicsContext2D();
-        rootGrid.add(horizontalCanvas, 0, 9, 7, 1);
+        rootGrid.add(horizontalCanvas, 0, 10, 7, 1);
         
         mainCanvas = new Canvas (IMAGE_SIZE_H, IMAGE_SIZE_H);
         mainGraphicsContext = mainCanvas.getGraphicsContext2D();
-        rootGrid.add(mainCanvas, 6, 0, 1, 10);
+        rootGrid.add(mainCanvas, 6, 0, 1, 11);
         
         /////////////////////////////////////////////////////////////////////////////
         // Initial fields settings
         /////////////////////////////////////////////////////////////////////////////
-        
-//        sourceField.setText("D:\\java\\projects\\Watermark");
-//        outputField.setText("d:\\java\\projects\\watermark\\output");
-//        watermarkTextField.setText("=== <Watermark text> ===");
-//        watermarkFontSizeField.setText("50");
-//        watermarkOpacityField.setText("0.2");
-//        previewFileField.setText("D:\\java\\projects\\Watermark\\1.original.jpg");
         
         getPreferences();
 
@@ -221,10 +202,14 @@ public class Starter extends Application{
         // Create primaryScene and show primaryStage
         /////////////////////////////////////////////////////////////////////////////
         
-        Scene primaryScene = new Scene(rootGrid, 1100, 730);
+        Scene primaryScene = new Scene(rootGrid, 1120, 730);
         primaryScene.getStylesheets().add(Starter.class.getResource("ui.css").toExternalForm());
         primaryStage.setScene(primaryScene);
         primaryStage.show();
+        primaryStage.setMaxHeight(primaryStage.getHeight());
+        primaryStage.setMinHeight(primaryStage.getHeight());
+        primaryStage.setMaxWidth(primaryStage.getWidth());
+        primaryStage.setMinWidth(primaryStage.getWidth());
     }
     
 	private void chooseFile(String fileChooseMode){
@@ -266,6 +251,22 @@ public class Starter extends Application{
 		        redraw();
 		    }
 		});
+		
+		sourceField.textProperty().addListener(new ChangeListener<String>() {
+		    @Override
+		    public void changed(ObservableValue<? extends String> observable,
+		    		String oldValue, String newValue) {
+        		fileProcessor.setSourceFolderString(sourceField.getText());
+        		fileProcessor.listFiles();
+        		SortedSet<File> fileSet = fileProcessor.getFileSet();
+        		if ((fileSet!=null)&&(fileSet.size()!=0)){
+        			previewFileField.setText(fileSet.first().getPath());
+        		}else{
+        			previewFileField.setText("");
+        		}		    	
+		    }
+		});		
+		
 		choosePreviewPrevBtn.setOnAction(new EventHandler<ActionEvent>() {
 	        @Override
 	        public void handle(ActionEvent event) {
@@ -279,7 +280,6 @@ public class Starter extends Application{
 	        		}
 	        		previousFile = imageFile;
 	        	}
-	        	//redraw();
 	        }
 		});
 		choosePreviewNextBtn.setOnAction(new EventHandler<ActionEvent>() {
@@ -296,40 +296,84 @@ public class Starter extends Application{
 	        			currentFile = imageFile;
 	        		}
 	        	}
-	        	//redraw();
 	        }
 		});
 		processFolderStartBtn.setOnAction(new EventHandler<ActionEvent>() {
-	        @Override
+	        @SuppressWarnings("unchecked")
+			@Override
 	        public void handle(ActionEvent event){
-	        	imageProcessor.setSourceFolder(sourceField.getText());
-	        	imageProcessor.setOutputFolder(outputField.getText());
-	        	//imageProcessor.processFolder();
-//	        	Thread imageProcessThread = new Thread(imageProcessor);
-//	        	imageProcessThread.start();
-	        	
-	        	//imageProcessor.
-	        	
-	        	statusLabel.textProperty().bind(imageProcessor.messageProperty());
-	        	new Thread(imageProcessor).start();
-	        	
-//	        	final ImageProcessorAWT ip = imageProcessor;
-//	        	
-//	        	processFolderTask = new Task<Void>(){
-//	        		 @Override 
-//	        		 public Void call() throws Exception {
-//			        	try {
-//			        		ip.processFolderConcurent();
-//						} catch (Exception e) {
-//							e.printStackTrace();
-//						}
-//			        	return null;
-//	    			}
-//	    		};
-
+        		try {
+					imageProcessor = new ImageProcessorAWT();
+					redraw();
+	                final Thread processFolderThread = new Thread(imageProcessor);
+	            	statusLabel.textProperty().bind(imageProcessor.messageProperty());
+	            	imageProcessor.setOnSucceeded(
+	        			new EventHandler<WorkerStateEvent>(){
+							@Override
+							public void handle(final WorkerStateEvent arg0) {
+								System.out.println("thread succeeded");
+								sourceField.setDisable(false);
+								outputField.setDisable(false);
+								watermarkFontSizeField.setDisable(false);
+								watermarkTextField.setDisable(false);
+								watermarkOpacityField.setDisable(false);
+								previewFileField.setDisable(false);
+						    	chooseSourceBtn.setDisable(false);
+						    	chooseDestinationBtn.setDisable(false);
+							    choosePreviewFileBtn.setDisable(false);
+							    choosePreviewPrevBtn.setDisable(false);
+							    choosePreviewNextBtn.setDisable(false);
+							    processFolderStartBtn.setDisable(false);
+						    	processFolderStopBtn.setDisable(true);
+							}
+	        				
+	        			});
+					sourceField.setDisable(true);
+					outputField.setDisable(true);
+					watermarkFontSizeField.setDisable(true);
+					watermarkTextField.setDisable(true);
+					watermarkOpacityField.setDisable(true);
+					previewFileField.setDisable(true);
+			    	chooseSourceBtn.setDisable(true);
+			    	chooseDestinationBtn.setDisable(true);
+				    choosePreviewFileBtn.setDisable(true);
+				    choosePreviewPrevBtn.setDisable(true);
+				    choosePreviewNextBtn.setDisable(true);
+				    processFolderStartBtn.setDisable(true);
+			    	processFolderStopBtn.setDisable(false);	            	
+	        		processFolderThread.start();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 	        }
 		});
 		
+		processFolderStopBtn.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+	        public void handle(ActionEvent event){
+				imageProcessor.setStopFolderProcess();
+	        }
+		}
+				
+		);
+		
+    	choosePreviewFileBtn.setOnAction(new EventHandler<ActionEvent>() {
+	        @Override
+	        public void handle(ActionEvent event){
+	        	FileChooser fileChooser = new FileChooser();
+	        	fileChooser.setTitle("Choose file to preview");
+	        	File initialDirectory = new File(sourceField.getText());
+	        	if(initialDirectory.exists() && initialDirectory.isDirectory()){
+	        		fileChooser.setInitialDirectory(initialDirectory);
+	        	}	        	
+	        	File file = fileChooser.showOpenDialog(primaryStage);
+                if (file != null) {
+                	previewFileField.setText(file.getPath());
+                	//sourceField.setText(file.getParent());
+                }
+	        }
+		});
+    	
     	chooseSourceBtn.setOnAction(new EventHandler<ActionEvent>() {
 	        @Override
 	        public void handle(ActionEvent event){
@@ -342,14 +386,14 @@ public class Starter extends Application{
 	        	File file = directoryChooser.showDialog(primaryStage);
 	        	if (file != null) {
 	        		sourceField.setText(file.getPath());
-	        		fileProcessor.setSourceFolderString(file.getPath());
-	        		fileProcessor.listFiles();
 	        		SortedSet<File> fileSet = fileProcessor.getFileSet();
-	        		if (fileSet!=null){
+	        		if ((fileSet!=null)&&(fileSet.size()!=0)){
 	        			previewFileField.setText(fileSet.first().getPath());
+		        	} else {
+		        		previewFileField.setText("");
 	        		}
 	        	}
-	        	//redraw();
+
 	        }
 		});
     	
@@ -368,30 +412,11 @@ public class Starter extends Application{
 	        	}	        	
 	        }
 		});
-    	
-    	choosePreviewFileBtn.setOnAction(new EventHandler<ActionEvent>() {
-	        @Override
-	        public void handle(ActionEvent event){
-	        	FileChooser fileChooser = new FileChooser();
-	        	fileChooser.setTitle("Choose file to preview");
-	        	File initialDirectory = new File(sourceField.getText());
-	        	if(initialDirectory.exists() && initialDirectory.isDirectory()){
-	        		fileChooser.setInitialDirectory(initialDirectory);
-	        	}	        	
-	        	File file = fileChooser.showOpenDialog(primaryStage);
-                if (file != null) {
-                	previewFileField.setText(file.getPath());
-                	sourceField.setText(file.getParent());
-	        		fileProcessor.setSourceFolderString(file.getParent());
-	        		fileProcessor.listFiles();
-                }
-                //redraw();
-	        }
-		});    	
 		
 		primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
 	          public void handle(WindowEvent we) {
 	        	  setPreferences();
+	        	  imageProcessor.setStopFolderProcess();
 	          }
 		});        		
 	}
@@ -420,8 +445,6 @@ public class Starter extends Application{
         imageProcessor.setOpacity(Double.parseDouble(watermarkOpacityField.getText().replace(',', '.')));
         imageProcessor.setSourceFolder(sourceField.getText());
         imageProcessor.setOutputFolder(outputField.getText());
-        imageProcessor.setStatusLabel(statusLabel);
-        imageProcessor.setProcessFolderTask(processFolderTask);
 
         verticalGraphicsContext.setFill(Color.web("#ffffff",1));
         verticalGraphicsContext.fillRect(0, 0, SCALED_PREVIW_X, SCALED_PREVIW_Y);
