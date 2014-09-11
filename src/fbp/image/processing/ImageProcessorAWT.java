@@ -146,6 +146,8 @@ public class ImageProcessorAWT extends Task{
 
 	    // create watermark text shape for rendering
         Font font = new Font(Font.SANS_SERIF, Font.PLAIN, fontSize);
+        
+        
 
         GlyphVector fontGV = font.createGlyphVector(g2d.getFontRenderContext(), watermarkText);
         Rectangle size = fontGV.getPixelBounds(g2d.getFontRenderContext(), 0, 0);
