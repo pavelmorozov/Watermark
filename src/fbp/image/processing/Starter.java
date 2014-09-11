@@ -42,10 +42,7 @@ public class Starter extends Application{
 	private Stage primaryStage;
 	private Preferences preferences;
 	private FileProcessor fileProcessor;
-<<<<<<< HEAD
 	private Image lastProcessed;
-=======
->>>>>>> branch 'master' of https://github.com/pavelmorozov/Watermark.git
 	
 	TextField 
 		sourceField,
@@ -326,7 +323,6 @@ public class Starter extends Application{
 	        public void handle(ActionEvent event){
         		try {
 					imageProcessor = new ImageProcessorAWT();
-<<<<<<< HEAD
 					//this redraw to set up processor
 					redraw("Current image");
 	                final Thread processFolderThread = new Thread(imageProcessor);
@@ -361,37 +357,6 @@ public class Starter extends Application{
 					//watermarkOpacityField.setDisable(true);
 					colorPicker.setDisable(true);
 					redrawBtn.setDisable(true);
-=======
-					redraw();
-	                final Thread processFolderThread = new Thread(imageProcessor);
-	            	statusLabel.textProperty().bind(imageProcessor.messageProperty());
-	            	imageProcessor.setOnSucceeded(
-	        			new EventHandler<WorkerStateEvent>(){
-							@Override
-							public void handle(final WorkerStateEvent arg0) {
-								System.out.println("thread succeeded");
-								sourceField.setDisable(false);
-								outputField.setDisable(false);
-								watermarkFontSizeField.setDisable(false);
-								watermarkTextField.setDisable(false);
-								watermarkOpacityField.setDisable(false);
-								previewFileField.setDisable(false);
-						    	chooseSourceBtn.setDisable(false);
-						    	chooseDestinationBtn.setDisable(false);
-							    choosePreviewFileBtn.setDisable(false);
-							    choosePreviewPrevBtn.setDisable(false);
-							    choosePreviewNextBtn.setDisable(false);
-							    processFolderStartBtn.setDisable(false);
-						    	processFolderStopBtn.setDisable(true);
-							}
-	        				
-	        			});
-					sourceField.setDisable(true);
-					outputField.setDisable(true);
-					watermarkFontSizeField.setDisable(true);
-					watermarkTextField.setDisable(true);
-					watermarkOpacityField.setDisable(true);
->>>>>>> branch 'master' of https://github.com/pavelmorozov/Watermark.git
 					previewFileField.setDisable(true);
 			    	chooseSourceBtn.setDisable(true);
 			    	chooseDestinationBtn.setDisable(true);
@@ -412,13 +377,7 @@ public class Starter extends Application{
 	        public void handle(ActionEvent event){
 				imageProcessor.setStopFolderProcess();
 	        }
-<<<<<<< HEAD
 		});
-=======
-		}
-				
-		);
->>>>>>> branch 'master' of https://github.com/pavelmorozov/Watermark.git
 		
     	choosePreviewFileBtn.setOnAction(new EventHandler<ActionEvent>() {
 	        @Override
@@ -475,7 +434,6 @@ public class Starter extends Application{
 	        	}	        	
 	        }
 		});
-<<<<<<< HEAD
     	
     	redrawBtn.setOnAction(new EventHandler<ActionEvent>() {
 	        @Override
@@ -524,8 +482,6 @@ public class Starter extends Application{
 //            	redraw();
 //            }
 //        });    	
-=======
->>>>>>> branch 'master' of https://github.com/pavelmorozov/Watermark.git
 		
         
         
