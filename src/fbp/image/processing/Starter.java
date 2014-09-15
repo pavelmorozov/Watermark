@@ -86,7 +86,7 @@ public class Starter extends Application {
 
 		GridPane rootGrid = new GridPane();
 		rootGrid.setId("rootGrid");
-		rootGrid.setGridLinesVisible(true);
+		//rootGrid.setGridLinesVisible(true);
 		rootGrid.setHgap(10);
 		rootGrid.setVgap(10);
 		rootGrid.setPadding(new Insets(5, 5, 5, 5));
@@ -125,8 +125,7 @@ public class Starter extends Application {
 
 		redrawBtn = new Button();
 		redrawBtn.setText("ReDraw");
-		// redrawBtn.setTooltip(new Tooltip(" Redraw preview \n images "));
-		rootGrid.add(redrawBtn, 4, 5);
+		rootGrid.add(redrawBtn, 4, 6);
 
 		Label watermarkFontSizeLabel = new Label("Font size:");
 		rootGrid.add(watermarkFontSizeLabel, 0, 4);
@@ -268,8 +267,8 @@ public class Starter extends Application {
 				Starter.class.getResource("ui.css").toExternalForm());
 		primaryStage.setScene(primaryScene);
 		primaryStage.show();
-		primaryStage.setMaxHeight(primaryStage.getHeight() + sceneReduce);
-		primaryStage.setMinHeight(primaryStage.getHeight());
+		primaryStage.setMaxHeight(primaryStage.getHeight());
+		primaryStage.setMinHeight(primaryStage.getHeight() - sceneReduce);
 		primaryStage.setMaxWidth(primaryStage.getWidth());
 		primaryStage.setMinWidth(primaryStage.getWidth());
 	}
@@ -289,15 +288,15 @@ public class Starter extends Application {
 	 */
 
 	private void listeners() {
-		watermarkFontSizeField.textProperty().addListener(
-				new ChangeListener<String>() {
-					@Override
-					public void changed(
-							ObservableValue<? extends String> observable,
-							String oldValue, String newValue) {
-						redraw("Current image");
-					}
-				});
+//		watermarkFontSizeField.textProperty().addListener(
+//				new ChangeListener<String>() {
+//					@Override
+//					public void changed(
+//							ObservableValue<? extends String> observable,
+//							String oldValue, String newValue) {
+//						redraw("Current image");
+//					}
+//				});
 		previewFileField.textProperty().addListener(
 				new ChangeListener<String>() {
 					@Override
@@ -386,10 +385,15 @@ public class Starter extends Application {
 									choosePreviewNextBtn.setDisable(false);
 									processFolderStartBtn.setDisable(false);
 									processFolderStopBtn.setDisable(true);
+									fontComboBox.setDisable(false);
+									promoModeComboBox.setDisable(false);
+									rotationTextField.setDisable(false);
+									resolutionXField.setDisable(false);
+									resolutionYField.setDisable(false);
+									saveCurrentBtn.setDisable(false);									
 									//Set up processor to current image
 									redraw("From file");
 								}
-
 							});
 					sourceField.setDisable(true);
 					outputField.setDisable(true);
@@ -406,6 +410,13 @@ public class Starter extends Application {
 					choosePreviewNextBtn.setDisable(true);
 					processFolderStartBtn.setDisable(true);
 					processFolderStopBtn.setDisable(false);
+					fontComboBox.setDisable(true);
+					promoModeComboBox.setDisable(true);
+					rotationTextField.setDisable(true);
+					resolutionXField.setDisable(true);
+					resolutionYField.setDisable(true);
+					saveCurrentBtn.setDisable(true);
+					
 					processFolderThread.start();
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -493,7 +504,6 @@ public class Starter extends Application {
 				try {
 					imageProcessor.saveScaledPromoImage();
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}

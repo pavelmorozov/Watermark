@@ -180,7 +180,7 @@ public class ImageProcessorAWT extends Task{
 //				exportImageHeight = (int)resolutionX;
 //			}
 			//Resize Image
-			
+				
 			imageProcessed = Scalr.resize(
 					imageToProcess, 
 					Scalr.Method.QUALITY,
@@ -214,7 +214,7 @@ public class ImageProcessorAWT extends Task{
 		
 		Font font;
 		if (processPromoToSave.equals("Use resolution")){
-			scale = (exportImageWidth+exportImageHeight)/
+			scale = (resolutionX+resolutionY)/
 					(IMAGE_SIZE_H+IMAGE_SIZE_W);
 			font = new Font(fontString, Font.PLAIN, 
 					(int)(fontSize*scale));
@@ -259,7 +259,7 @@ public class ImageProcessorAWT extends Task{
         	double imagePromoY =  mouseY - y;
         	
         	if (processPromoToSave.equals("Use resolution")){
-        		g2d.translate(imagePromoX*(int)scale, imagePromoY*(int)scale);
+        		g2d.translate(imagePromoX*scale, imagePromoY*scale);
         	}else{
         		g2d.translate(imagePromoX, imagePromoY);
         	}
