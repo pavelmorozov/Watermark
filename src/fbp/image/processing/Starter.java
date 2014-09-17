@@ -565,14 +565,22 @@ public class Starter extends Application {
 			sourceField.setText(preferences.get("sourceField", ""));
 			outputField.setText(preferences.get("outputField", ""));
 			watermarkFontSizeField.setText(Integer.toString(preferences.getInt(
-					"watermarkFontSizeField", 0)));
+					"watermarkFontSizeField", 40)));
 			// watermarkOpacityField.setText(Double.toString(preferences.getDouble("watermarkOpacityField",
 			// 0.0)));
 			watermarkTextField.setText(preferences
-					.get("watermarkTextField", ""));
+					.get("watermarkTextField", "Watermark"));
 			previewFileField.setText(preferences.get("previewFileField", ""));
+		} catch (Exception e) {
+			System.out.println(e);
+		}
+		try{
 			colorPicker
 					.setValue(Color.valueOf(preferences.get("textColor", "")));
+		} catch (Exception e) {
+			System.out.println(e);
+		}
+		try{
 			fontComboBox.setValue(preferences.get("fontString", ""));
 			rotationTextField
 					.setText(preferences.get("rotationTextField", "0"));

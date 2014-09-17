@@ -265,8 +265,8 @@ public class ImageProcessorAWT extends Task{
         	}
         	g2d.fill(rotatedText);
         }else if (promoMode.equals("None (Tile)")){
-            double yStep = textHeight + textWidth*Math.sin(Math.PI * 2 * rotation/ 360);
-            double xStep = textHeight + textWidth*Math.cos(Math.PI * 2 * rotation/ 360);
+            double yStep = textHeight + textWidth*Math.abs(Math.sin(Math.PI * rotation/ 180));
+            double xStep = textHeight + textWidth*Math.abs(Math.cos(Math.PI * rotation/ 180));
             if ((yStep <= 0)||(xStep <= 0)) { 
             	//imageProcessed = destinationImage;
             	return imageProcessed;
