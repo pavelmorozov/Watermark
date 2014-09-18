@@ -16,6 +16,7 @@ import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
@@ -40,11 +41,11 @@ import javafx.stage.WindowEvent;
 public class Starter extends Application {
 
 	private static final String APP_CAPTION = "Resize & Watermark";
-	private final static int IMAGE_SIZE_X = 720;
-	private final static int IMAGE_SIZE_Y = 480;
-	private final int ADD_Y = 92;
-	private static final Integer SCALED_PREVIW_X = 192;
-	private static final Integer SCALED_PREVIW_Y = 288;
+	private final static int IMAGE_SIZE_X = 720;//720;
+	private final static int IMAGE_SIZE_Y = 480;//480;
+	private final int ADD_Y = 0;
+	private static final Integer SCALED_PREVIW_X = 160;//160;//192;
+	private static final Integer SCALED_PREVIW_Y = 240;//240;//288
 	private ImageProcessorAWT imageProcessor;
 	private Stage primaryStage;
 	private Preferences preferences;
@@ -87,77 +88,81 @@ public class Starter extends Application {
 		GridPane rootGrid = new GridPane();
 		rootGrid.setId("rootGrid");
 		//rootGrid.setGridLinesVisible(true);
-		rootGrid.setHgap(10);
-		rootGrid.setVgap(10);
-		rootGrid.setPadding(new Insets(5, 5, 5, 5));
+		rootGrid.setHgap(5);
+		rootGrid.setVgap(5);
+		rootGrid.setPadding(new Insets(2, 2, 2, 2));
 
 		Text titleText = new Text(APP_CAPTION);
 		titleText.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
 		rootGrid.add(titleText, 0, 0, 5, 1);
 
-		Label sourceLabel = new Label("Source folder:");
+		Label sourceLabel = new Label("Source:");
 		rootGrid.add(sourceLabel, 0, 1);
 
 		sourceField = new TextField();
 		sourceField.setId("sourceField");
+		sourceField.setMaxWidth(195);
 		rootGrid.add(sourceField, 1, 1, 4, 1);
 
 		chooseSourceBtn = new Button();
 		chooseSourceBtn.setText("...");
 		rootGrid.add(chooseSourceBtn, 5, 1);
 
-		Label destinationLabel = new Label("Destination folder:");
+		Label destinationLabel = new Label("Destination:");
 		rootGrid.add(destinationLabel, 0, 2);
 
 		outputField = new TextField();
 		outputField.setId("outputField");
+		outputField.setMaxWidth(195);
 		rootGrid.add(outputField, 1, 2, 4, 1);
 
 		chooseDestinationBtn = new Button();
 		chooseDestinationBtn.setText("...");
 		rootGrid.add(chooseDestinationBtn, 5, 2);
 
-		Label watermarkTextLabel = new Label("Watermark text:");
+		Label watermarkTextLabel = new Label("Watermark:");
 		rootGrid.add(watermarkTextLabel, 0, 3);
 
 		watermarkTextField = new TextField();
+		watermarkTextField.setMaxWidth(195);
 		rootGrid.add(watermarkTextField, 1, 3, 4, 1);
 
-		redrawBtn = new Button();
-		redrawBtn.setText("ReDraw");
-		rootGrid.add(redrawBtn, 4, 6);
-
-		Label watermarkFontSizeLabel = new Label("Font size:");
+		Label watermarkFontSizeLabel = new Label("Font:");
 		rootGrid.add(watermarkFontSizeLabel, 0, 4);
 
 		watermarkFontSizeField = new TextField();
-		watermarkFontSizeField.setMaxWidth(40);
+		watermarkFontSizeField.setMaxWidth(45);
 		rootGrid.add(watermarkFontSizeField, 1, 4, 1, 1);
 
-		// Now create the ComboBox
 		fontComboBox = new ComboBox<>();
-		fontComboBox.setMaxWidth(155);
+		fontComboBox.setMaxWidth(145);
 		// Fill the ComboBox with all the font names
 		fontsToComboBox(fontComboBox);
 		// Set the renderer for the combobox
 		fontComboBox.setCellFactory(new ComboBoxCellFactory());
-		rootGrid.add(fontComboBox, 2, 4, 4, 1);
+		rootGrid.add(fontComboBox, 2, 4, 3, 1);
 
 		Label watermarkOpacityLabel = new Label("Color:");
 		rootGrid.add(watermarkOpacityLabel, 0, 5);
 
-		// watermarkOpacityField = new TextField ();
-		// watermarkOpacityField.setMaxWidth(40);
-		// rootGrid.add(watermarkOpacityField, 1, 5, 1, 1);
+//		watermarkOpacityField = new TextField ();
+//		watermarkOpacityField.setMaxWidth(40);
+//		rootGrid.add(watermarkOpacityField, 1, 5, 1, 1);
 
 		colorPicker = new ColorPicker(Color.web("#ffcce6"));
+		colorPicker.setMinWidth(95);
 		rootGrid.add(colorPicker, 1, 5, 2, 1);
+		
+		redrawBtn = new Button();
+		redrawBtn.setText("ReDraw");
+		redrawBtn.setMinWidth(95);
+		rootGrid.add(redrawBtn, 3, 6, 2, 1);
 
 		Label rotationLabel = new Label("Rotation:");
 		rootGrid.add(rotationLabel, 0, 6);
 
 		rotationTextField = new TextField();
-		rotationTextField.setMaxWidth(40);
+		rotationTextField.setMaxWidth(45);
 		rootGrid.add(rotationTextField, 1, 6, 1, 1);
 
 		Label promoLabel = new Label("Promo:");
@@ -165,33 +170,35 @@ public class Starter extends Application {
 
 		ObservableList<String> modesList = FXCollections
 				.observableArrayList("None (Tile)", "Center", "Custom");
-		//"Corner: left bottom", "Corner: right bottom",
-		//"Corner: left top", "Corner: right top"
 		promoModeComboBox = new ComboBox<>(modesList);
 		promoModeComboBox.setValue("None (Tile)");
-		promoModeComboBox.setMaxWidth(150);
-		rootGrid.add(promoModeComboBox, 1, 7, 3, 1);
+		promoModeComboBox.setMaxWidth(195);
+		promoModeComboBox.setMinWidth(195);
+		rootGrid.add(promoModeComboBox, 1, 7, 4, 1);
 
 		Label resolutionLabel = new Label("Resolution:");
 		rootGrid.add(resolutionLabel, 0, 8);
 
 		resolutionXField = new TextField();
-		resolutionXField.setMaxWidth(40);
+		resolutionXField.setMaxWidth(45);
 		rootGrid.add(resolutionXField, 1, 8, 1, 1);
 
 		resolutionYField = new TextField();
-		resolutionYField.setMaxWidth(40);
+		resolutionYField.setMaxWidth(45);
 		rootGrid.add(resolutionYField, 2, 8, 1, 1);
 
 		saveCurrentBtn = new Button();
-		// saveCurrentBtn.setMinWidth(100);
+		saveCurrentBtn.setMinWidth(95);
 		saveCurrentBtn.setText("Save current");
 		rootGrid.add(saveCurrentBtn, 3, 8, 2, 1);
 
 		Label previewFileLabel = new Label("Preview:");
+		previewFileLabel.setMinWidth(60);
 		rootGrid.add(previewFileLabel, 0, 9);
 
 		previewFileField = new TextField();
+		previewFileField.setMaxWidth(195);
+		previewFileField.setMinWidth(195);
 		rootGrid.add(previewFileField, 1, 9, 4, 1);
 
 		choosePreviewFileBtn = new Button();
@@ -199,27 +206,29 @@ public class Starter extends Application {
 		rootGrid.add(choosePreviewFileBtn, 5, 9);
 
 		choosePreviewPrevBtn = new Button();
-		choosePreviewPrevBtn.setText("- < -");
-		// choosePreviewPrevBtn.setTooltip(new
-		// Tooltip("Previous image\n preview"));
-
+		choosePreviewPrevBtn.setText("<");
+		choosePreviewPrevBtn.setMinWidth(45);
 		rootGrid.add(choosePreviewPrevBtn, 1, 10);
 
 		choosePreviewNextBtn = new Button();
-		choosePreviewNextBtn.setText("- > -");
-		// choosePreviewNextBtn.setTooltip(new Tooltip("Next image\n preview"));
+		choosePreviewNextBtn.setText(">");
+		choosePreviewNextBtn.setMinWidth(45);
 		rootGrid.add(choosePreviewNextBtn, 2, 10);
 
 		processFolderStartBtn = new Button();
 		processFolderStartBtn.setText("Start");
+		processFolderStartBtn.setMinWidth(45);
+		processFolderStartBtn.setMaxWidth(45);
 		rootGrid.add(processFolderStartBtn, 3, 10);
 
 		processFolderStopBtn = new Button();
 		processFolderStopBtn.setText("Stop");
+		processFolderStopBtn.setMinWidth(45);
+		processFolderStopBtn.setMaxWidth(45);
 		rootGrid.add(processFolderStopBtn, 4, 10);
 
 		statusLabel = new Label("Ready");
-		rootGrid.add(statusLabel, 3, 11, 2, 1);
+		rootGrid.add(statusLabel, 4, 11, 2, 1);
 
 		verticalCanvas = new Canvas(SCALED_PREVIW_X, SCALED_PREVIW_Y);
 		verticalGraphicsContext = verticalCanvas.getGraphicsContext2D();
@@ -227,12 +236,12 @@ public class Starter extends Application {
 
 		horizontalCanvas = new Canvas(SCALED_PREVIW_Y, SCALED_PREVIW_X);
 		horizontalGraphicsContext = horizontalCanvas.getGraphicsContext2D();
-		rootGrid.add(horizontalCanvas, 0, 13, 7, 1);
+		rootGrid.add(horizontalCanvas, 0, 13, 6, 1);
 
 		mainCanvas = new Canvas(IMAGE_SIZE_X, IMAGE_SIZE_X + ADD_Y);
 		mainGraphicsContext = mainCanvas.getGraphicsContext2D();
 		rootGrid.add(mainCanvas, 6, 0, 1, 14);
-
+		
 		// ///////////////////////////////////////////////////////////////////////////
 		// Initial fields settings
 		// ///////////////////////////////////////////////////////////////////////////
@@ -258,8 +267,8 @@ public class Starter extends Application {
 		// Create primaryScene and show primaryStage
 		// ///////////////////////////////////////////////////////////////////////////
 
-		int sceneH = 820;
-		int sceneW = 1120;
+		int sceneH = 740;
+		int sceneW = 1020;
 		int sceneReduce = 0;
 
 		primaryScene = new Scene(rootGrid, sceneW, sceneH - sceneReduce);
