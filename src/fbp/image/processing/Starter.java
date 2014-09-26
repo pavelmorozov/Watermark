@@ -56,7 +56,8 @@ public class Starter extends Application {
 
 	private TextField sourceField, outputField, watermarkFontSizeField,
 			watermarkTextField, watermarkOpacityField, previewFileField,
-			rotationTextField, resolutionXField, resolutionYField;
+			rotationTextField, resolutionXField, resolutionYField,
+			stepXField, stepYField;
 	private GraphicsContext verticalGraphicsContext, horizontalGraphicsContext,
 			mainGraphicsContext;
 	private Canvas verticalCanvas, horizontalCanvas, mainCanvas;
@@ -152,6 +153,16 @@ public class Starter extends Application {
 		colorPicker = new ColorPicker(Color.web("#ffcce6"));
 		colorPicker.setMinWidth(95);
 		rootGrid.add(colorPicker, 1, 5, 2, 1);
+		
+		stepXField = new TextField();
+		stepXField.setMaxWidth(45);
+		stepXField.setPromptText("X step");
+		rootGrid.add(stepXField, 3, 5);
+		
+		stepYField = new TextField();
+		stepYField.setMaxWidth(45);
+		stepYField.setPromptText("Y step");
+		rootGrid.add(stepYField, 4, 5);
 		
 		redrawBtn = new Button();
 		redrawBtn.setText("ReDraw");
@@ -399,7 +410,9 @@ public class Starter extends Application {
 									rotationTextField.setDisable(false);
 									resolutionXField.setDisable(false);
 									resolutionYField.setDisable(false);
-									saveCurrentBtn.setDisable(false);									
+									saveCurrentBtn.setDisable(false);
+									stepXField.setDisable(false);
+									stepYField.setDisable(false);									
 									//Set up processor to current image
 									redraw("From file");
 								}
@@ -425,7 +438,8 @@ public class Starter extends Application {
 					resolutionXField.setDisable(true);
 					resolutionYField.setDisable(true);
 					saveCurrentBtn.setDisable(true);
-					
+					stepXField.setDisable(true);
+					stepYField.setDisable(true);
 					processFolderThread.start();
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -592,7 +606,11 @@ public class Starter extends Application {
 		try{
 			fontComboBox.setValue(preferences.get("fontString", ""));
 			rotationTextField
-					.setText(preferences.get("rotationTextField", "0"));
+				.setText(preferences.get("rotationTextField", "0"));
+			stepXField
+				.setText(preferences.get("stepXField", "0"));
+			stepYField
+				.setText(preferences.get("stepYField", "0"));			
 			promoModeComboBox.setValue(preferences.get("promoModeComboBox", ""));
 			mouseX = preferences.getDouble("mouseX", 0.0);
 			mouseY = preferences.getDouble("mouseY", 0.0);
@@ -615,6 +633,8 @@ public class Starter extends Application {
 		preferences.put("textColor", colorPicker.getValue().toString());
 		preferences.put("fontString", fontComboBox.getValue());
 		preferences.put("rotationTextField", rotationTextField.getText());
+		preferences.put("stepXField", stepXField.getText());
+		preferences.put("stepYField", stepYField.getText());
 		preferences.put("promoModeComboBox",promoModeComboBox.getValue());
 		preferences.putDouble("mouseX", mouseX);
 		preferences.putDouble("mouseY", mouseY);
@@ -641,11 +661,23 @@ public class Starter extends Application {
 		imageProcessor.setFontString(fontComboBox.getValue());
 		imageProcessor
 				.setRotation(Integer.parseInt(rotationTextField.getText()));
+		try{
+			imageProcessor.setXStep(
+				Double.parseDouble(stepXField.getText()));
+		}catch (Exception e){
+			imageProcessor.setXStep(0.0);
+		}
+		
+		try{
+			imageProcessor.setYStep(
+				Double.parseDouble(stepYField.getText()));
+		}catch (Exception e){
+			imageProcessor.setYStep(0.0);
+		}		
 		imageProcessor.setPromoMode(promoModeComboBox.getValue());
 		imageProcessor.setX(mouseX);
 		imageProcessor.setY(mouseY);
 		imageProcessor.setGraphicsContext(mainGraphicsContext);
-
 		//imageProcessor.setGraphicsContext(verticalGraphicsContext);
 		verticalGraphicsContext.setFill(Color.web("#ffffff", 1));
 		verticalGraphicsContext

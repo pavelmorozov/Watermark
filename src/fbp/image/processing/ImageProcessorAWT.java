@@ -47,6 +47,8 @@ public class ImageProcessorAWT extends Task{
 	private double resolutionX;
 	private double resolutionY;
 	private String processPromoToSave;
+	private Double xAddStep;
+	private Double yAddStep;
 	
 	public ImageProcessorAWT() throws Exception {
 		stopFolderProcess = false;
@@ -57,6 +59,13 @@ public class ImageProcessorAWT extends Task{
     // Initial settings
     /////////////////////////////////////////////////////////////////////////////
 	
+	public void setXStep(Double xStep){
+		this.xAddStep = xStep;
+	}	
+	public void setYStep(Double yStep){
+		this.yAddStep = yStep;
+	}	
+
 	public void setResolutionX(String resolutionX){
 		this.resolutionX = Double.parseDouble(resolutionX); 
 	}
@@ -265,8 +274,11 @@ public class ImageProcessorAWT extends Task{
         	}
         	g2d.fill(rotatedText);
         }else if (promoMode.equals("None (Tile)")){
-            double yStep = textHeight + textWidth*Math.abs(Math.sin(Math.PI * rotation/ 180));
-            double xStep = textHeight + textWidth*Math.abs(Math.cos(Math.PI * rotation/ 180));
+
+       		double xStep = xAddStep + textHeight + textWidth*Math.abs(Math.cos(Math.PI * rotation/ 180));
+
+       		double yStep = yAddStep + textHeight + textWidth*Math.abs(Math.sin(Math.PI * rotation/ 180));
+            
             if ((yStep <= 0)||(xStep <= 0)) { 
             	//imageProcessed = destinationImage;
             	return imageProcessed;
